@@ -1,38 +1,52 @@
 ---
-name: Bug report
-about: Шаблон баг-репорта
+name: Bug
+about: Для описания и фиксации багов и проблем для исправления
 title: ''
-labels: ''
+labels: 'type: bug'
 assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+> Описание бага (заголовок не нужен, сразу текст)
+>
+> Четкое и краткое описание ошибки.
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+**Как воcпроизвести**
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+> Шаги для воспроизведения:
+> 1. Переходим к «...»
+> 2. Нажимаем «....»
+> 3. Прокручиваем вниз до «....»
+> 4. Ошибка будет в левом верхнем углу
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+**Ожидаемое поведение**
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+> Четкое и краткое описание ожидаемого поведения.
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+**Скриншоты и схемы**
 
-**Additional context**
-Add any other context about the problem here.
+> Скриншоты и прочие графические заметки для объяснения проблемы.
+
+**Системная информация:**
+
+> В зависимости от платформы
+
+> Логи нужно прятать под кат:
+
+<details><summary>Логи</summary>
+<p>
+[Логи внутри]
+</p>
+</details>
+
+```
+<details><summary>Логи</summary>
+<p>
+[Логи внутри]
+</p>
+</details>
+```
+
+**Дополнительная информация**
+
+> Дополнительные подробности о проблеме.
