@@ -1,61 +1,60 @@
-# Declarative labels description
-- name: and: blocking
+- name: and:_blocking
   description: This Artifact blocking any other one
   color: #D93F0B
-- name: and: duplicate
+- name: and:_duplicate
   description: This issue or pull request already exists
   color: #EDEEC9
-- name: and: help wanted
+- name: and:_help_wanted
   description: Extra attention is needed
   color: #DDE7C7
-- name: and: invalid
+- name: and:_invalid
   description: This doesn't seem right
   color: #D93F0B
-- name: and: question
+- name: and:_question
   description: Further information is requested
   color: #98C9A3
-- name: and: wont fix
+- name: and:_wont_fix
   description: This will not be worked on
   color: #77BFA3
-- name: complexity: 1
+- name: complexity:_1
   description: Easy project Artifact complexity
   color: #FFCDB2
-- name: complexity: 3
+- name: complexity:_3
   description: Low project Artifact complexity
   color: #FFB4A2
-- name: complexity: 7
+- name: complexity:_7
   description: Medium project Artifact complexity
   color: #E5989B
-- name: complexity: 15
+- name: complexity:_15
   description: High project Artifact complexity
   color: #B5838D
-- name: complexity: 31
+- name: complexity:_31
   description: Extreme project Artifact complexity
   color: #6D6875
-- name: complexity: ∞
+- name: complexity:_∞
   description: Undefined project Artifact complexity
   color: #524B5E
-- name: priority: 1
+- name: priority:_1
   description: High project Artifact priority
   color: #D93F0B
-- name: priority: 2
+- name: priority:_2
   description: Medium project Artifact priority
   color: #FAC79D
-- name: priority: 3
+- name: priority:_3
   description: Low project Artifact priority
   color: #FFFCED
-- name: type: backlog
+- name: type:_backlog
   description: Raw business-logic data for Scenarios forming
   color: #92DBE5
-- name: type: bug
+- name: type:_bug
   description: Something isn't working
   color: #D93F0B
-- name: type: documentation
+- name: type:_documentation
   description: Improvements or additions to documentation
   color: #2C7A9E
-- name: type: enhancement
+- name: type:_enhancement
   description: New feature or request
   color: #FED9B7
-- name: type: story
+- name: type:_story
   description: User's or Engineer's value deploy Scenario
   color: #FDFCDC
