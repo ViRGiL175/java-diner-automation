@@ -1,3 +1,4 @@
+# Declarative labels description
 - name: and: blocking
   description: This Artifact blocking any other one
   color: #D93F0B
