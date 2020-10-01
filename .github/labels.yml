@@ -1,0 +1,60 @@
+- name: and: blocking
+  description: This Artifact blocking any other one
+  color: #D93F0B
+- name: and: duplicate
+  description: This issue or pull request already exists
+  color: #EDEEC9
+- name: and: help wanted
+  description: Extra attention is needed
+  color: #DDE7C7
+- name: and: invalid
+  description: This doesn't seem right
+  color: #D93F0B
+- name: and: question
+  description: Further information is requested
+  color: #98C9A3
+- name: and: wont fix
+  description: This will not be worked on
+  color: #77BFA3
+- name: complexity: 1
+  description: Easy project Artifact complexity
+  color: #FFCDB2
+- name: complexity: 3
+  description: Low project Artifact complexity
+  color: #FFB4A2
+- name: complexity: 7
+  description: Medium project Artifact complexity
+  color: #E5989B
+- name: complexity: 15
+  description: High project Artifact complexity
+  color: #B5838D
+- name: complexity: 31
+  description: Extreme project Artifact complexity
+  color: #6D6875
+- name: complexity: ∞
+  description: Undefined project Artifact complexity
+  color: #524B5E
+- name: priority: 1
+  description: High project Artifact priority
+  color: #D93F0B
+- name: priority: 2
+  description: Medium project Artifact priority
+  color: #FAC79D
+- name: priority: 3
+  description: Low project Artifact priority
+  color: #FFFCED
+- name: type: backlog
+  description: Raw business-logic data for Scenarios forming
+  color: #92DBE5
+- name: type: bug
+  description: Something isn't working
+  color: #D93F0B
+- name: type: documentation
+  description: Improvements or additions to documentation
+  color: #2C7A9E
+- name: type: enhancement
+  description: New feature or request
+  color: #FED9B7
+- name: type: story
+  description: User's or Engineer's value deploy Scenario
+  color: #FDFCDC
