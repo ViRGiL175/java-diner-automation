@@ -2,6 +2,8 @@
 
 ![Sync Labels](https://github.com/ViRGiL175/java-diner-automation/workflows/Sync%20Labels/badge.svg?branch=master)
 
+[🎨 JamBoard для работы](https://jamboard.google.com/d/1oGgPynlELwIrN4HikChA2LTjyG3BxIJ6QRIgQBCPUAI/)
+
 ![](https://user-images.githubusercontent.com/11541555/94340316-d7ce5600-0011-11eb-9ce1-1a37dd19e487.png)
 
 **Автоматическая система для отслеживания и автоматизации состояния дайнера 60-х годов**
