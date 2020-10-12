@@ -91,23 +91,11 @@
     </orderEntry>
     <orderEntry type="module-library" exported="">
       <library>
-        <ANNOTATIONS>
-          <root url="jar://$MODULE_DIR$/src/ru/virgil/java-diner-signal-source-2.1.1.jar!/" />
-        </ANNOTATIONS>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/src/ru/virgil/java-diner-signal-source-2.1.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/src/ru/virgil/java-diner-signal-source-2.1.0.jar!/" />
         </CLASSES>
-        <JAVADOC>
-          <root url="jar://$MODULE_DIR$/src/ru/virgil/java-diner-signal-source-2.1.1.jar!/" />
-        </JAVADOC>
-        <NATIVE>
-          <root url="jar://$MODULE_DIR$/src/ru/virgil/java-diner-signal-source-2.1.1.jar!/" />
-        </NATIVE>
-        <SOURCES>
-          <root url="jar://$MODULE_DIR$/src/ru/virgil/java-diner-signal-source-2.1.1.jar!/" />
-        </SOURCES>
-        <jarDirectory url="jar://$MODULE_DIR$/src/ru/virgil/java-diner-signal-source-2.1.1.jar!/" recursive="false" />
-        <jarDirectory url="jar://$MODULE_DIR$/src/ru/virgil/java-diner-signal-source-2.1.1.jar!/" recursive="false" type="SOURCES" />
+        <JAVADOC />
+        <SOURCES />
       </library>
     </orderEntry>
   </component>
