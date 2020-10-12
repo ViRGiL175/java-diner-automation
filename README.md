@@ -4,10 +4,10 @@
 
 | Гитхаб | Проект | Другое |
 | ------------- | ------------- | ------------- |
-| [☑️Ишью](https://github.com/ViRGiL175/java-diner-automation/issues) | [🔨Бэклог](https://github.com/ViRGiL175/java-diner-automation/issues?q=is%3Aopen+is%3Aissue+label%3Atype%3A_backlog) |  [📊Диаграмма сгорания задач](https://docs.google.com/spreadsheets/d/11WExuqO-JX2lWy97cep6fsB-xxdMYn6Rw-43noMy32E/edit#gid=0) |
-| [🔁Пулл-реквесты](https://github.com/ViRGiL175/java-diner-automation/pulls) | [📁Цели](https://github.com/ViRGiL175/java-diner-automation/projects/1) | [👷‍♂️ООП-схема](https://github.com/ViRGiL175/java-diner-automation/issues/21#issue-715050088) |
-| [🔢Релизы](https://github.com/ViRGiL175/java-diner-automation/releases) | [🎬Истории](https://github.com/ViRGiL175/java-diner-automation/issues?q=is%3Aopen+is%3Aissue+label%3Atype%3A_story) | [🎨 JamBoard для работы](https://jamboard.google.com/d/1oGgPynlELwIrN4HikChA2LTjyG3BxIJ6QRIgQBCPUAI/) |
-| [📜Проджекты](https://github.com/ViRGiL175/java-diner-automation/projects) | [👍Улучшения](https://github.com/ViRGiL175/java-diner-automation/issues?q=is%3Aopen+is%3Aissue+label%3Atype%3A_enhancement) | [🧘‍♀️Стратегия Скрам]() |
+| [☑️ Ишью](https://github.com/ViRGiL175/java-diner-automation/issues) | [🔨 Бэклог](https://github.com/ViRGiL175/java-diner-automation/issues?q=is%3Aopen+is%3Aissue+label%3Atype%3A_backlog) |  [📊 Диаграмма сгорания задач](https://docs.google.com/spreadsheets/d/11WExuqO-JX2lWy97cep6fsB-xxdMYn6Rw-43noMy32E/edit#gid=0) |
+| [🔁 Пулл-реквесты](https://github.com/ViRGiL175/java-diner-automation/pulls) | [📁 Цели](https://github.com/ViRGiL175/java-diner-automation/projects/1) | [👷‍♂️ООП-схема](https://github.com/ViRGiL175/java-diner-automation/issues/21#issue-715050088) |
+| [🔢 Релизы](https://github.com/ViRGiL175/java-diner-automation/releases) | [🎬 Истории](https://github.com/ViRGiL175/java-diner-automation/issues?q=is%3Aopen+is%3Aissue+label%3Atype%3A_story) | [🎨 JamBoard для работы](https://jamboard.google.com/d/1oGgPynlELwIrN4HikChA2LTjyG3BxIJ6QRIgQBCPUAI/) |
+| [📜 Проджекты](https://github.com/ViRGiL175/java-diner-automation/projects) | [👍 Улучшения](https://github.com/ViRGiL175/java-diner-automation/issues?q=is%3Aopen+is%3Aissue+label%3Atype%3A_enhancement) | [🧘‍♀️ Стратегия Скрам](https://github.com/ViRGiL175/java-diner-automation/issues/26) |
 <!-- | []() | []() | []() | --> 
 
 
