@@ -8,6 +8,7 @@
 | [🔁 Пулл-реквесты](https://github.com/ViRGiL175/java-diner-automation/pulls) | [📁 Цели](https://github.com/ViRGiL175/java-diner-automation/projects/1) | [👷‍♂️ ООП-схема](https://github.com/ViRGiL175/java-diner-automation/issues/21#issue-715050088) |
 | [🔢 Релизы](https://github.com/ViRGiL175/java-diner-automation/releases) | [🎬 Истории](https://github.com/ViRGiL175/java-diner-automation/issues?q=is%3Aopen+is%3Aissue+label%3Atype%3A_story) | [🎨 JamBoard для работы](https://jamboard.google.com/d/1oGgPynlELwIrN4HikChA2LTjyG3BxIJ6QRIgQBCPUAI/) |
 | [📜 Проджекты](https://github.com/ViRGiL175/java-diner-automation/projects) | [👍 Улучшения](https://github.com/ViRGiL175/java-diner-automation/issues?q=is%3Aopen+is%3Aissue+label%3Atype%3A_enhancement) | [🧘‍♀️ Стратегия Скрам](https://github.com/ViRGiL175/java-diner-automation/issues/26) |
+| []() | []() | [✅ Dashboard бэклога](https://docs.google.com/spreadsheets/d/1b0UuGS_HXTGv-Bc9LcB_58gZvo5fttyKgle0s4DmRNI/edit?ts=5f872473#gid=0) |
 <!-- | []() | []() | []() | --> 
 
 
