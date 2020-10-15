@@ -1,30 +1,35 @@
 package ru.commandos.Rooms;
 
+import io.reactivex.rxjava3.subjects.ReplaySubject;
 import ru.commandos.Humans.Barmen;
+import ru.commandos.Humans.Waiter;
 import ru.commandos.Order;
 
-import java.util.HashSet;
+import java.util.ArrayDeque;
 
 public class Bar extends Room {
 
     public Barmen barmen;
 
-    private HashSet<String> drinks = new HashSet<>();
-    {
-        drinks.add("Шампанское \"Советское\"");
-        drinks.add("Какао \"Школьное\"");
-    }
+    public ArrayDeque<Order> readyOrder = new ArrayDeque<>();
 
-    public void setBarmen(Barmen barmen) {
-        this.barmen = barmen;
-        System.out.println("Бармен готов спаивать посетителей");
-    }
-
-    public Boolean canDo(String s) {
-        return drinks.contains(s);
-    }
+    private final ReplaySubject<Order> dashboard = ReplaySubject.create();
+    private final ReplaySubject<String> bell = ReplaySubject.create();
 
     public void acceptOrder(Order order) {
-        barmen.shake(order);
+        dashboard.onNext(order);
+    }
+
+    public void transferDrinks(Order order) {
+        readyOrder.add(order);
+        bell.onNext(Bar.class.getSimpleName());
+    }
+
+    public void subscribe(Waiter waiter) {
+        bell.subscribe(waiter);
+    }
+
+    public void subscribe(Barmen barmen) {
+        dashboard.subscribe(barmen);
     }
 }

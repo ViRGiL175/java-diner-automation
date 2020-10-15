@@ -5,9 +5,10 @@ import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import ru.commandos.Diner;
 import ru.commandos.Order;
+import ru.commandos.Rooms.Bar;
 import ru.commandos.Rooms.Kitchen;
 
-public class Waiter extends Staff implements Observer<Integer> {
+public class Waiter extends Staff implements Observer<String> {
 
     Order order;
     Kitchen kitchen;
@@ -15,46 +16,53 @@ public class Waiter extends Staff implements Observer<Integer> {
     public Waiter(Diner diner, Kitchen kitchen) {
         super(diner);
         this.kitchen = kitchen;
-        money = "$0";
     }
 
-    public void acceptOrder(Integer tableNumber) {
-        diner.tables.getClient(tableNumber).setMenu(diner.getMenu());
-        order = diner.tables.getClient(tableNumber).getOrder();
-        System.out.println("Официант взял заказ: " + order);
+    public void acceptTablesOrder(Integer tableNumber) {
+        diner.getHall().getTables().getClient(tableNumber).setMenu(diner.getMenu());
+        order = diner.getHall().getTables().getClient(tableNumber).getOrder();
+        System.out.println("Официант взял заказ в Зале: " + order);
         transferOrder(order);
     }
 
     private void transferOrder(Order order) {
-        for (String s : order.food) {
-            if (kitchen.canDo(s)) {
-                System.out.println("Заказ передан в кухню");
-                kitchen.acceptOrder(order);
-                break;
-            }
+        if (!order.food.isEmpty()) {
+            System.out.println("Заказ передан в кухню");
+            kitchen.acceptOrder(order);
         }
-        if (!order.isready()) {
-            for (String s : order.food) {
-                if (diner.bar.canDo(s)) {
-                    System.out.println("Заказ передан в бар");
-                    diner.bar.acceptOrder(order);
-                    break;
-                }
-            }
+        if (!order.drinks.isEmpty()) {
+            System.out.println("Заказ передан в бар");
+            diner.getHall().getBar().acceptOrder(order);
         }
+    }
+
+    private void carryOrder(Order order) {
         System.out.println("Официант взял готовый заказ");
-        diner.tables.getClient(order.table).setOrder(order);
-        changeMoney(diner.tables.getClient(order.table).pay());
+        diner.getHall().getTables().getClient(order.table).setOrder(order);
+        changeMoney(diner.getHall().getTables().getClient(order.table).pay());
+        diner.getHall().getTables().clientGone(order.table);
     }
 
     @Override
     public void onSubscribe(@NonNull Disposable d) {
-        System.out.println("Официант готов принимать заказы");
     }
 
     @Override
-    public void onNext(@NonNull Integer integer) {
-        acceptOrder(integer);
+    public void onNext(@NonNull String s) {
+        if (s.equals(Kitchen.class.getSimpleName())) {
+            order = kitchen.readyOrder.pollFirst();
+            if (order.isready()) {
+                carryOrder(order);
+            }
+        } else if (s.equals(Bar.class.getSimpleName())) {
+            order = diner.getHall().getBar().readyOrder.pollFirst();
+            if (order.isready()) {
+                carryOrder(order);
+            }
+        } else {
+            Integer table = Integer.valueOf(new StringBuffer(s).delete(0, 6).toString());
+            acceptTablesOrder(table);
+        }
     }
 
     @Override

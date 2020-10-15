@@ -1,32 +1,35 @@
 package ru.commandos;
 
 import java.util.HashSet;
-import java.util.Objects;
 
 public class Order {
 
     public HashSet<String> food;
-    public HashSet<String> done = new HashSet<>();
+    public HashSet<String> drinks;
+    public HashSet<String> doneFood = new HashSet<>();
+    public HashSet<String> doneDrinks = new HashSet<>();
     public Integer table;
     public Double cost = 0.;
 
-    public Order(HashSet<String> food, Menu menu, Integer table) {
+    public Order(HashSet<String> food, HashSet<String> drinks, Menu menu, Integer table, Double cost) {
         this.food = food;
-        for (String s : food) {
-            cost += menu.menu.get(s);
-        }
+        this.drinks = drinks;
         this.table = table;
+        this.cost = cost;
     }
 
     public Boolean isready() {
-        return food.equals(done);
+        return food.equals(doneFood) && drinks.equals(doneDrinks);
     }
 
     @Override
     public String toString() {
         return "Order{" +
                 "food=" + food +
-                ", table=" + (table + 1) +
+                ", drinks=" + drinks +
+                ", doneFood=" + doneFood +
+                ", doneDrinks=" + doneDrinks +
+                ", table=" + table +
                 ", cost=" + cost +
                 '}';
     }
@@ -37,8 +40,7 @@ public class Order {
         if (!(o instanceof Order)) return false;
         Order order = (Order) o;
         return food.equals(order.food) &&
-                done.equals(order.done) &&
-                table.equals(order.table) &&
-                cost.equals(order.cost);
+                drinks.equals(order.drinks) &&
+                table.equals(order.table);
     }
 }
