@@ -10,16 +10,19 @@ public class Diner {
 
     private final Menu menu = new Menu();
     private final Hall hall = new Hall(this);
+    private final DriveThru driveThru = new DriveThru();
     private final Kitchen kitchen = new Kitchen();
     private final Cook cook = new Cook(this, kitchen);
     private final Barmen barmen = new Barmen(this, hall.getBar());
-    private final Waiter waiter = new Waiter(this, kitchen);
+    private final Waiter waiter = new Waiter(this, kitchen, driveThru);
 
     public Diner(Observable<String> subject) {
         System.out.println("Дайнер начал работу");
         kitchen.subscribe(cook);
         kitchen.subscribe(waiter);
-        subject.subscribe(this.getHall());
+        subject.subscribe(hall);
+        subject.subscribe(driveThru);
+        driveThru.subscribe(waiter);
     }
 
     public Menu getMenu() {
@@ -36,5 +39,9 @@ public class Diner {
 
     public Hall getHall() {
         return hall;
+    }
+
+    public DriveThru getDriveThru() {
+        return driveThru;
     }
 }

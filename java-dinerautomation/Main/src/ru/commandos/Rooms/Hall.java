@@ -37,9 +37,9 @@ public class Hall extends Room implements Observer<String> {
 
     @Override
     public void onNext(@NonNull String s) {
-        Gson gson = new Gson();
-        Client client = gson.fromJson(s, Client.class);
-        tables.setClient(client);
+//        Gson gson = new Gson();
+//        Client client = gson.fromJson(s, Client.class);
+//        tables.setClient(client);
     }
 
     @Override
