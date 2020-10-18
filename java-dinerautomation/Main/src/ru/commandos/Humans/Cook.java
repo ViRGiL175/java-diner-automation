@@ -7,8 +7,6 @@ import ru.commandos.Diner;
 import ru.commandos.Order;
 import ru.commandos.Rooms.Kitchen;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Cook extends Staff implements Observer<Order> {
 
@@ -19,14 +17,11 @@ public class Cook extends Staff implements Observer<Order> {
         this.kitchen = kitchen;
     }
 
-    private void cook (Order order) {
+    private void cook(Order order) {
         System.out.println("Повар готовит");
-        for (String s : order.food) {
-            if (kitchen.canDo(s)) {
-                order.done.add(s);
-            }
-        }
+        order.doneFood.addAll(order.food);
         System.out.println("Повар приготовил блюда");
+        kitchen.transferDish(order);
     }
 
     @Override
