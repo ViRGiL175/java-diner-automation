@@ -8,12 +8,14 @@ public class Order {
     public HashSet<String> drinks;
     public HashSet<String> doneFood = new HashSet<>();
     public HashSet<String> doneDrinks = new HashSet<>();
+    public Boolean onAuto;
     public Integer table;
     public Double cost = 0.;
 
-    public Order(HashSet<String> food, HashSet<String> drinks, Menu menu, Integer table, Double cost) {
+    public Order(HashSet<String> food, HashSet<String> drinks, Menu menu, Boolean onAuto, Integer table, Double cost) {
         this.food = food;
         this.drinks = drinks;
+        this.onAuto = onAuto;
         this.table = table;
         this.cost = cost;
     }
@@ -29,7 +31,7 @@ public class Order {
                 ", drinks=" + drinks +
                 ", doneFood=" + doneFood +
                 ", doneDrinks=" + doneDrinks +
-                ", table=" + table +
+                ((onAuto) ? (", onAuto=" + onAuto) : (", table=" + table)) +
                 ", cost=" + cost +
                 '}';
     }

@@ -7,22 +7,44 @@ import ru.commandos.Diner;
 import ru.commandos.Order;
 import ru.commandos.Rooms.Bar;
 import ru.commandos.Rooms.Kitchen;
+import ru.commandos.Rooms.DriveThru;
 
 public class Waiter extends Staff implements Observer<String> {
 
     Order order;
     Kitchen kitchen;
+    DriveThru driveThru;
 
-    public Waiter(Diner diner, Kitchen kitchen) {
+    public Waiter(Diner diner, Kitchen kitchen, DriveThru driveThru) {
         super(diner);
         this.kitchen = kitchen;
+        this.driveThru = driveThru;
+        money = "$0";
     }
 
     public void acceptTablesOrder(Integer tableNumber) {
         diner.getHall().getTables().getClient(tableNumber).setMenu(diner.getMenu());
         order = diner.getHall().getTables().getClient(tableNumber).getOrder();
-        System.out.println("Официант взял заказ в Зале: " + order);
-        transferOrder(order);
+        if (order.cost == 0.) {
+            System.out.println("Клиент ничего не заказал");
+            diner.getHall().getTables().clientGone(order.table);
+        } else {
+            System.out.println("Официант взял заказ в Зале: " + order);
+            transferOrder(order);
+        }
+    }
+
+    public void acceptPitOrder() {
+        driveThru.getCar().setMenu(diner.getMenu());
+        driveThru.getCar().setOnAuto(true);
+        order = driveThru.getCar().getOrder();
+        if (order.cost == 0.) {
+            System.out.println("Клиент ничего не заказал");
+            driveThru.carGone();
+        } else {
+            System.out.println("Официант взял заказ на Драйв-тру: " + order);
+            transferOrder(order);
+        }
     }
 
     private void transferOrder(Order order) {
@@ -38,9 +60,14 @@ public class Waiter extends Staff implements Observer<String> {
 
     private void carryOrder(Order order) {
         System.out.println("Официант взял готовый заказ");
-        diner.getHall().getTables().getClient(order.table).setOrder(order);
-        changeMoney(diner.getHall().getTables().getClient(order.table).pay());
-        diner.getHall().getTables().clientGone(order.table);
+        if (order.onAuto) {
+            driveThru.getCar().setOrder(order);
+            changeMoney(driveThru.carGone().pay());
+        } else {
+            diner.getHall().getTables().getClient(order.table).setOrder(order);
+            changeMoney(diner.getHall().getTables().getClient(order.table).pay());
+            diner.getHall().getTables().clientGone(order.table);
+        }
     }
 
     @Override
@@ -49,7 +76,9 @@ public class Waiter extends Staff implements Observer<String> {
 
     @Override
     public void onNext(@NonNull String s) {
-        if (s.equals(Kitchen.class.getSimpleName())) {
+        if (s.equals(DriveThru.class.getSimpleName())) {
+            acceptPitOrder();
+        } else if (s.equals(Kitchen.class.getSimpleName())) {
             order = kitchen.readyOrder.pollFirst();
             if (order.isready()) {
                 carryOrder(order);

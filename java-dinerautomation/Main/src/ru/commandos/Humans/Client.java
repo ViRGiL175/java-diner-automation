@@ -10,10 +10,15 @@ import java.util.Random;
 
 public class Client extends Human {
 
+    private Boolean onAuto = false;
     private Integer table;
     private Menu menu;
     private String uuid;
     private Order order;
+
+    public void setOnAuto(Boolean onAuto) {
+        this.onAuto = onAuto;
+    }
 
     public void setTable(Integer table) {
         this.table = table;
@@ -24,7 +29,6 @@ public class Client extends Human {
         this.menu = menu;
         System.out.println("Клиент " + this + " получил меню");
     }
-
 
     public Order getOrder() {
         Random random = new Random();
@@ -56,7 +60,7 @@ public class Client extends Human {
                 cost += menu.drinks.get(menuDrinks.get(number));
             }
         }
-        order = new Order(orderFood, orderDrinks, menu, table, cost);
+        order = new Order(orderFood, orderDrinks, menu, onAuto, table, cost);
         return order;
     }
 
