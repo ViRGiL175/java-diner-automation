@@ -7,6 +7,8 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import ru.commandos.Diner;
 import ru.commandos.Humans.Client;
 
+import java.util.Random;
+
 public class Hall extends Room implements Observer<String> {
 
     private Diner diner;
@@ -37,9 +39,14 @@ public class Hall extends Room implements Observer<String> {
 
     @Override
     public void onNext(@NonNull String s) {
-//        Gson gson = new Gson();
-//        Client client = gson.fromJson(s, Client.class);
-//        tables.setClient(client);
+        Gson gson = new Gson();
+        Client client = gson.fromJson(s, Client.class);
+        if (new Random().nextInt(10) > 3) {
+            tables.setClient(client);
+        }
+        else {
+            bar.setClient(client);
+        }
     }
 
     @Override

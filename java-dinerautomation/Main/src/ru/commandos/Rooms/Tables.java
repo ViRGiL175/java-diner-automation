@@ -10,12 +10,12 @@ import java.util.Random;
 
 public class Tables extends Room {
 
-    private final ArrayList<Client> clients = new ArrayList<>();
+    private final ArrayList<Client> tables = new ArrayList<>();
     private final HashSet<Integer> freePlace = new HashSet<>();
 
     {
         for (int i = 0; i < 10; i++) {
-            clients.add(null);
+            tables.add(null);
             freePlace.add(i);
         }
     }
@@ -28,17 +28,18 @@ public class Tables extends Room {
     }
 
     public Client getClient(Integer tableNumber) {
-        return clients.get(tableNumber);
+        return tables.get(tableNumber);
     }
 
     public void setClient(Client client) {
         if (!freePlace.isEmpty()) {
             int random = new Random().nextInt(freePlace.size());
             Integer table = new ArrayList<>(freePlace).get(random);
+            client.setOrderPlace(orderPlace.TABLES);
             client.setTable(table);
-            clients.set(table, client);
+            tables.set(table, client);
             freePlace.remove(table);
-            System.out.println("Клиент " + client + " готов сделать заказ!");
+            System.out.println("Клиент " + client + " готов сделать заказ в зале!");
             caller.onNext(Tables.class.getSimpleName() + table);
         } else {
             System.out.println("Мест нет!");
@@ -46,7 +47,7 @@ public class Tables extends Room {
     }
 
     public void clientGone(Integer table) {
-        clients.set(table, null);
+        tables.set(table, null);
         freePlace.add(table);
         System.out.println("Клиент ушёл, столик №" + table + " освободился");
     }

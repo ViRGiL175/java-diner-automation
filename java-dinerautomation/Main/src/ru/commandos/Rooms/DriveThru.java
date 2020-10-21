@@ -38,6 +38,7 @@ public class DriveThru extends Room implements Observer<String> {
         Gson gson = new Gson();
         Client client = gson.fromJson(s, Client.class);
         cars.add(client);
+        client.setOrderPlace(orderPlace.DRIVETHRU);
         caller.onNext(DriveThru.class.getSimpleName());
     }
 

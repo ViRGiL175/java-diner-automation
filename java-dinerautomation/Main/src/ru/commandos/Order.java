@@ -1,5 +1,7 @@
 package ru.commandos;
 
+import ru.commandos.Rooms.Room;
+
 import java.util.HashSet;
 
 public class Order {
@@ -8,14 +10,14 @@ public class Order {
     public HashSet<String> drinks;
     public HashSet<String> doneFood = new HashSet<>();
     public HashSet<String> doneDrinks = new HashSet<>();
-    public Boolean onAuto;
+    public Room.orderPlace orderPlace;
     public Integer table;
     public Double cost = 0.;
 
-    public Order(HashSet<String> food, HashSet<String> drinks, Menu menu, Boolean onAuto, Integer table, Double cost) {
+    public Order(HashSet<String> food, HashSet<String> drinks, Menu menu, Room.orderPlace orderPlace, Integer table, Double cost) {
         this.food = food;
         this.drinks = drinks;
-        this.onAuto = onAuto;
+        this.orderPlace = orderPlace;
         this.table = table;
         this.cost = cost;
     }
@@ -31,7 +33,9 @@ public class Order {
                 ", drinks=" + drinks +
                 ", doneFood=" + doneFood +
                 ", doneDrinks=" + doneDrinks +
-                ((onAuto) ? (", onAuto=" + onAuto) : (", table=" + table)) +
+                ((orderPlace == Room.orderPlace.DRIVETHRU)
+                        ? (", orderPlace=" + orderPlace.name())
+                        : (", orderPlace=" + orderPlace.name() + ", table=" + table)) +
                 ", cost=" + cost +
                 '}';
     }

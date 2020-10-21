@@ -21,8 +21,8 @@ public class Diner {
         kitchen.subscribe(cook);
         kitchen.subscribe(waiter);
         subject.subscribe(hall);
-        subject.subscribe(driveThru);
-        driveThru.subscribe(waiter);
+//        subject.subscribe(driveThru);
+//        driveThru.subscribe(waiter);
     }
 
     public Menu getMenu() {

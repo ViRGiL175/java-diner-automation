@@ -3,6 +3,7 @@ package ru.commandos.Humans;
 import ru.commandos.Diner;
 import ru.commandos.Menu;
 import ru.commandos.Order;
+import ru.commandos.Rooms.Room;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -10,14 +11,14 @@ import java.util.Random;
 
 public class Client extends Human {
 
-    private Boolean onAuto = false;
+    private Room.orderPlace orderPlace;
     private Integer table;
     private Menu menu;
     private String uuid;
     private Order order;
 
-    public void setOnAuto(Boolean onAuto) {
-        this.onAuto = onAuto;
+    public void setOrderPlace(Room.orderPlace orderPlace) {
+        this.orderPlace = orderPlace;
     }
 
     public void setTable(Integer table) {
@@ -60,7 +61,7 @@ public class Client extends Human {
                 cost += menu.drinks.get(menuDrinks.get(number));
             }
         }
-        order = new Order(orderFood, orderDrinks, menu, onAuto, table, cost);
+        order = new Order(orderFood, orderDrinks, menu, orderPlace, table, cost);
         return order;
     }
 
