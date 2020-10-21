@@ -48,6 +48,12 @@ public class Barmen extends Staff implements Observer<String> {
         bar.getClient(order.table).setOrder(order);
         changeMoney(bar.getClient(order.table).pay());
         bar.clientGone(order.table);
+        givePaymentToBookkeeper();
+    }
+
+    private void givePaymentToBookkeeper() {
+        diner.getBookkeeper().giveClientPayment(getDoubleMoney());
+        money = "$0";
     }
 
     @Override

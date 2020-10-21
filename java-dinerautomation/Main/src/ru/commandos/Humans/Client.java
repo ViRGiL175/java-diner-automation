@@ -1,6 +1,5 @@
 package ru.commandos.Humans;
 
-import ru.commandos.Diner;
 import ru.commandos.Menu;
 import ru.commandos.Order;
 import ru.commandos.Rooms.Room;
@@ -49,14 +48,14 @@ public class Client extends Human {
 
         for (int i = 0; i < foods; i++) {
             int number = random.nextInt(menu.food.size());
-            if (menu.food.get(menuFood.get(number)) <= getMoney() - cost) {
+            if (menu.food.get(menuFood.get(number)) <= getDoubleMoney() - cost) {
                 orderFood.add(menuFood.get(number));
                 cost += menu.food.get(menuFood.get(number));
             }
         }
         for (int i = 0; i < drink; i++) {
             int number = random.nextInt(menu.drinks.size());
-            if (menu.drinks.get(menuDrinks.get(number)) <= getMoney() - cost) {
+            if (menu.drinks.get(menuDrinks.get(number)) <= getDoubleMoney() - cost) {
                 orderDrinks.add(menuDrinks.get(number));
                 cost += menu.drinks.get(menuDrinks.get(number));
             }
