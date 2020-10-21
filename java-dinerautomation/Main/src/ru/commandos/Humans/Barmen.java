@@ -7,6 +7,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import ru.commandos.Diner;
 import ru.commandos.Order;
 import ru.commandos.Rooms.Bar;
+import ru.commandos.Rooms.Room;
 
 
 public class Barmen extends Staff implements Observer<String> {
@@ -21,7 +22,9 @@ public class Barmen extends Staff implements Observer<String> {
     private void shake(Order order) {
         order.doneDrinks.addAll(order.drinks);
         System.out.println("Бармен сделал напитки");
-        bar.transferDrinks(order);
+        if (order.orderPlace != Room.orderPlace.BAR || !order.food.isEmpty()) {
+            bar.transferDrinks(order);
+        }
     }
 
     private void acceptOrder(Integer chairNumber) {
@@ -37,14 +40,18 @@ public class Barmen extends Staff implements Observer<String> {
     }
 
     private void transferOrder(Order order) {
-        shake(order);
+        if (!order.drinks.isEmpty()) {
+            shake(order);
+        }
         if (!order.food.isEmpty()) {
-            System.out.println("Заказ передан в кухню");
             bar.transferOrder(order);
+        }
+        else if(order.orderPlace == Room.orderPlace.BAR){
+            setReadyOrder(order);
         }
     }
 
-    public void setReadyOrderFromKithen(Order order) {
+    public void setReadyOrder(Order order) {
         bar.getClient(order.table).setOrder(order);
         changeMoney(bar.getClient(order.table).pay());
         bar.clientGone(order.table);

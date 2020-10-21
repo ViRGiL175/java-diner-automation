@@ -8,7 +8,7 @@ public class Main {
 
         OuterWorld outerWorld = OuterWorld.singleton();
 
-        Diner diner = new Diner(outerWorld.getClientsSource());
+        Diner diner = new Diner(outerWorld.getClientsSource(), outerWorld.getDateSource());
 
         outerWorld.run();
     }

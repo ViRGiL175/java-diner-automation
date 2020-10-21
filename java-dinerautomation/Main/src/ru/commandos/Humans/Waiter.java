@@ -67,7 +67,7 @@ public class Waiter extends Staff implements Observer<String> {
             diner.getHall().getTables().clientGone(order.table);
             givePaymentToBookkeeper();
         } else {
-            diner.getBarmen().setReadyOrderFromKithen(order);
+            diner.getBarmen().setReadyOrder(order);
         }
     }
 
