@@ -2,7 +2,7 @@ package ru.commandos.Humans;
 
 abstract class Human {
 
-    protected String money;
+    protected String money = "$0";
 
     protected Double getMoney() {
         return Double.parseDouble(new StringBuffer(money).delete(0, 1).toString());

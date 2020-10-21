@@ -1,4 +1,8 @@
 package ru.commandos.Rooms;
 
-abstract class Room {
+public abstract class Room {
+
+    public enum orderPlace {
+        TABLES, BAR, DRIVETHRU
+    }
 }

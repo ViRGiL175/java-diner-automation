@@ -1,13 +1,12 @@
 package ru.commandos.Humans;
 
+import com.google.gson.Gson;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import ru.commandos.Diner;
 import ru.commandos.Order;
-import ru.commandos.Rooms.Bar;
-import ru.commandos.Rooms.Kitchen;
-import ru.commandos.Rooms.DriveThru;
+import ru.commandos.Rooms.*;
 
 public class Waiter extends Staff implements Observer<String> {
 
@@ -19,7 +18,6 @@ public class Waiter extends Staff implements Observer<String> {
         super(diner);
         this.kitchen = kitchen;
         this.driveThru = driveThru;
-        money = "$0";
     }
 
     public void acceptTablesOrder(Integer tableNumber) {
@@ -36,7 +34,6 @@ public class Waiter extends Staff implements Observer<String> {
 
     public void acceptPitOrder() {
         driveThru.getCar().setMenu(diner.getMenu());
-        driveThru.getCar().setOnAuto(true);
         order = driveThru.getCar().getOrder();
         if (order.cost == 0.) {
             System.out.println("Клиент ничего не заказал");
@@ -60,14 +57,21 @@ public class Waiter extends Staff implements Observer<String> {
 
     private void carryOrder(Order order) {
         System.out.println("Официант взял готовый заказ");
-        if (order.onAuto) {
+        if (order.orderPlace == Room.orderPlace.DRIVETHRU) {
             driveThru.getCar().setOrder(order);
             changeMoney(driveThru.carGone().pay());
-        } else {
+        } else if (order.orderPlace == Room.orderPlace.TABLES) {
             diner.getHall().getTables().getClient(order.table).setOrder(order);
             changeMoney(diner.getHall().getTables().getClient(order.table).pay());
             diner.getHall().getTables().clientGone(order.table);
+        } else {
+            diner.getBarmen().setReadyOrderFromKithen(order);
         }
+    }
+
+    private void transferOrderFromBar(Order order) {
+        System.out.println("Заказ передан в кухню");
+        kitchen.acceptOrder(order);
     }
 
     @Override
@@ -88,9 +92,11 @@ public class Waiter extends Staff implements Observer<String> {
             if (order.isready()) {
                 carryOrder(order);
             }
-        } else {
-            Integer table = Integer.valueOf(new StringBuffer(s).delete(0, 6).toString());
+        } else if (s.substring(0, 6).equals(Tables.class.getSimpleName())) {
+            Integer table = Integer.parseInt(new StringBuffer(s).delete(0, 6).toString());
             acceptTablesOrder(table);
+        } else {
+            transferOrderFromBar(new Gson().fromJson(s, Order.class));
         }
     }
 
