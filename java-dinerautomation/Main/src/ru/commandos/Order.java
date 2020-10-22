@@ -1,21 +1,23 @@
 package ru.commandos;
 
+import ru.commandos.Food.Dish.Dish;
+import ru.commandos.Food.Drink.Drink;
 import ru.commandos.Rooms.Room;
 
 import java.util.HashSet;
 
 public class Order {
 
-    public HashSet<String> food;
-    public HashSet<String> drinks;
-    public HashSet<String> doneFood = new HashSet<>();
-    public HashSet<String> doneDrinks = new HashSet<>();
+    public HashSet<Dish> dishes;
+    public HashSet<Drink> drinks;
+    public HashSet<Dish> doneDishes = new HashSet<>();
+    public HashSet<Drink> doneDrinks = new HashSet<>();
     public Room.orderPlace orderPlace;
     public Integer table;
     public Double cost = 0.;
 
-    public Order(HashSet<String> food, HashSet<String> drinks, Menu menu, Room.orderPlace orderPlace, Integer table, Double cost) {
-        this.food = food;
+    public Order(HashSet<Dish> dishes, HashSet<Drink> drinks, Menu menu, Room.orderPlace orderPlace, Integer table, Double cost) {
+        this.dishes = dishes;
         this.drinks = drinks;
         this.orderPlace = orderPlace;
         this.table = table;
@@ -23,15 +25,15 @@ public class Order {
     }
 
     public Boolean isready() {
-        return food.equals(doneFood) && drinks.equals(doneDrinks);
+        return dishes.equals(doneDishes) && drinks.equals(doneDrinks);
     }
 
     @Override
     public String toString() {
         return "Order{" +
-                "food=" + food +
+                "food=" + dishes +
                 ", drinks=" + drinks +
-                ", doneFood=" + doneFood +
+                ", doneFood=" + doneDishes +
                 ", doneDrinks=" + doneDrinks +
                 ((orderPlace == Room.orderPlace.DRIVETHRU)
                         ? (", orderPlace=" + orderPlace.name())
@@ -45,7 +47,7 @@ public class Order {
         if (this == o) return true;
         if (!(o instanceof Order)) return false;
         Order order = (Order) o;
-        return food.equals(order.food) &&
+        return dishes.equals(order.dishes) &&
                 drinks.equals(order.drinks) &&
                 table.equals(order.table);
     }

@@ -15,13 +15,14 @@ public class Diner {
     private final Hall hall = new Hall(this);
     private final DriveThru driveThru = new DriveThru();
     private final Kitchen kitchen = new Kitchen();
-    private final Bookkeeping bookkeeping = new Bookkeeping(this);
     private final Cook cook = new Cook(this, kitchen);
     private final Barmen barmen = new Barmen(this, hall.getBar());
     private final Waiter waiter = new Waiter(this, kitchen, driveThru);
+    private final Bookkeeping bookkeeping = new Bookkeeping(this);
     private final Bookkeeper bookkeeper = new Bookkeeper(this, bookkeeping);
 
     public Diner(Observable<String> jsonObservable, Observable<Date> dateObservable) {
+        bookkeeping.createPayMap();
         System.out.println("Дайнер начал работу");
         kitchen.subscribe(cook);
         kitchen.subscribe(waiter);
@@ -41,6 +42,10 @@ public class Diner {
 
     public DriveThru getDriveThru() {
         return driveThru;
+    }
+
+    public Kitchen getKitchen() {
+        return kitchen;
     }
 
     public Bookkeeper getBookkeeper() {

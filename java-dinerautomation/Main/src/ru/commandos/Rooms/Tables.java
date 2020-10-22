@@ -1,6 +1,6 @@
 package ru.commandos.Rooms;
 
-import io.reactivex.rxjava3.subjects.ReplaySubject;
+import io.reactivex.rxjava3.subjects.PublishSubject;
 import ru.commandos.Humans.Client;
 import ru.commandos.Humans.Waiter;
 
@@ -20,7 +20,7 @@ public class Tables extends Room {
         }
     }
 
-    private final ReplaySubject<String> caller = ReplaySubject.create();
+    private final PublishSubject<String> caller = PublishSubject.create();
 
     public void subscribe(Waiter waiter) {
         caller.subscribe(waiter);
