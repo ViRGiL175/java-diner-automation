@@ -1,13 +1,15 @@
 package ru.commandos.Humans;
 
-import com.google.gson.Gson;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import ru.commandos.Diner;
+import ru.commandos.Food.Drink.Drink;
 import ru.commandos.Order;
 import ru.commandos.Rooms.Bar;
 import ru.commandos.Rooms.Room;
+
+import java.util.Random;
 
 
 public class Barmen extends Staff implements Observer<String> {
@@ -17,13 +19,27 @@ public class Barmen extends Staff implements Observer<String> {
     public Barmen(Diner diner, Bar bar) {
         super(diner);
         this.bar = bar;
+        currentRoom = bar;
     }
 
     private void shake(Order order) {
-        order.doneDrinks.addAll(order.drinks);
+        for(Drink drink : order.drinks) {
+            for (String ingredient : drink.getIngredients().keySet()) {
+                bar.getIngredients(ingredient, drink.getIngredients().get(ingredient));
+            }
+            order.doneDrinks.add(drink);
+        }
+        System.out.println("Ингредиентов осталось в баре: " + bar.checkIngredients());
         System.out.println("Бармен сделал напитки");
-        if (order.orderPlace != Room.orderPlace.BAR || !order.food.isEmpty()) {
-            bar.transferDrinks(order);
+        currentRoom.getDirty();
+
+        useToilet();
+
+        if (order.orderPlace != Room.OrderPlace.BAR || !order.dishes.isEmpty()) {
+            bar.transfer(order);
+        }
+        else {
+            setReadyOrder(order);
         }
     }
 
@@ -43,15 +59,13 @@ public class Barmen extends Staff implements Observer<String> {
         if (!order.drinks.isEmpty()) {
             shake(order);
         }
-        if (!order.food.isEmpty()) {
-            bar.transferOrder(order);
-        }
-        else if(order.orderPlace == Room.orderPlace.BAR){
-            setReadyOrder(order);
+        else {
+            bar.transfer(order);
         }
     }
 
     public void setReadyOrder(Order order) {
+        System.out.println("Бармен отдаёт заказ клиенту");
         bar.getClient(order.table).setOrder(order);
         changeMoney(bar.getClient(order.table).pay());
         bar.clientGone(order.table);
@@ -59,8 +73,16 @@ public class Barmen extends Staff implements Observer<String> {
     }
 
     private void givePaymentToBookkeeper() {
-        diner.getBookkeeper().giveClientPayment(getDoubleMoney());
+        diner.getBookkeeper().giveClientPayment(getMoney());
         money = "$0";
+    }
+
+    @Override
+    public void useToilet() {
+        if (new Random().nextInt(10) < 2) {
+            System.out.println(this.getClass().getSimpleName() + " воспользовался туалетом");
+            diner.getHall().getToilet().getDirty();
+        }
     }
 
     @Override
@@ -70,13 +92,12 @@ public class Barmen extends Staff implements Observer<String> {
 
     @Override
     public void onNext(@NonNull String s) {
-        if (s.substring(0, 3).equals(Bar.class.getSimpleName())) {
-            Integer table = Integer.parseInt(new StringBuffer(s).delete(0, 3).toString());
-            acceptOrder(table);
+        if (s.equals(Waiter.class.getSimpleName())) {
+            shake(bar.getWaitOrder());
         }
         else {
-            Order order = new Gson().fromJson(s, Order.class);
-            shake(order);
+            Integer table = Integer.parseInt(new StringBuffer(s).delete(0, 3).toString());
+            acceptOrder(table);
         }
     }
 

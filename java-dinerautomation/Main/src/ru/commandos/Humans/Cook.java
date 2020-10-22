@@ -4,8 +4,11 @@ import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import ru.commandos.Diner;
+import ru.commandos.Food.Dish.Dish;
 import ru.commandos.Order;
 import ru.commandos.Rooms.Kitchen;
+
+import java.util.Random;
 
 
 public class Cook extends Staff implements Observer<Order> {
@@ -15,13 +18,32 @@ public class Cook extends Staff implements Observer<Order> {
     public Cook(Diner diner, Kitchen kitchen) {
         super(diner);
         this.kitchen = kitchen;
+        currentRoom = kitchen;
     }
 
     private void cook(Order order) {
         System.out.println("Повар готовит");
-        order.doneFood.addAll(order.food);
+        for (Dish dish : order.dishes) {
+            for (String ingredient : dish.getIngredients().keySet()) {
+                kitchen.getIngredients(ingredient, dish.getIngredients().get(ingredient));
+            }
+            order.doneDishes.add(dish);
+        }
+        currentRoom.getDirty();
+
+        useToilet();
+
+        System.out.println("Ингредиентов осталось на кухне: " + kitchen.checkIngredients());
         System.out.println("Повар приготовил блюда");
         kitchen.transferDish(order);
+    }
+
+    @Override
+    public void useToilet() {
+        if (new Random().nextInt(10) < 2) {
+            System.out.println(this.getClass().getSimpleName() + " воспользовался туалетом");
+            diner.getHall().getToilet().getDirty();
+        }
     }
 
     @Override

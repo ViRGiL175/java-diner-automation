@@ -1,8 +1,12 @@
 package ru.commandos.Humans;
 
+import ru.commandos.Food.Dish.Dish;
+import ru.commandos.Food.Drink.Drink;
 import ru.commandos.Menu;
 import ru.commandos.Order;
+import ru.commandos.Rooms.Bar;
 import ru.commandos.Rooms.Room;
+import ru.commandos.Rooms.Tables;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -10,13 +14,13 @@ import java.util.Random;
 
 public class Client extends Human {
 
-    private Room.orderPlace orderPlace;
+    private Room.OrderPlace orderPlace;
     private Integer table;
     private Menu menu;
     private String uuid;
     private Order order;
 
-    public void setOrderPlace(Room.orderPlace orderPlace) {
+    public void setOrderPlace(Room.OrderPlace orderPlace) {
         this.orderPlace = orderPlace;
     }
 
@@ -39,23 +43,23 @@ public class Client extends Human {
             drink = random.nextInt(menu.drinks.size() + 1);
         }
 
-        ArrayList<String> menuFood = new ArrayList<>(menu.food.keySet());
-        ArrayList<String> menuDrinks = new ArrayList<>(menu.drinks.keySet());
+        ArrayList<Dish> menuFood = new ArrayList<>(menu.food.keySet());
+        ArrayList<Drink> menuDrinks = new ArrayList<>(menu.drinks.keySet());
 
-        HashSet<String> orderFood = new HashSet<>();
-        HashSet<String> orderDrinks = new HashSet<>();
+        HashSet<Dish> orderFood = new HashSet<>();
+        HashSet<Drink> orderDrinks = new HashSet<>();
         Double cost = 0.;
 
         for (int i = 0; i < foods; i++) {
             int number = random.nextInt(menu.food.size());
-            if (menu.food.get(menuFood.get(number)) <= getDoubleMoney() - cost) {
+            if (menu.food.get(menuFood.get(number)) <= getMoney() - cost) {
                 orderFood.add(menuFood.get(number));
                 cost += menu.food.get(menuFood.get(number));
             }
         }
         for (int i = 0; i < drink; i++) {
             int number = random.nextInt(menu.drinks.size());
-            if (menu.drinks.get(menuDrinks.get(number)) <= getDoubleMoney() - cost) {
+            if (menu.drinks.get(menuDrinks.get(number)) <= getMoney() - cost) {
                 orderDrinks.add(menuDrinks.get(number));
                 cost += menu.drinks.get(menuDrinks.get(number));
             }
@@ -66,16 +70,32 @@ public class Client extends Human {
 
     public void setOrder(Order order) {
         if (!this.order.equals(order)) {
-            System.out.println("Официант ошибся с заказом :(");
+            System.err.println("Официант ошибся с заказом :(");
         } else {
             System.out.println("Клиент получил заказ");
         }
+        currentRoom.getDirty();
+
+        useToilet();
+
     }
 
     public Double pay() {
         changeMoney(-order.cost);
         System.out.println("Клиент оплатил заказ");
         return order.cost;
+    }
+
+    @Override
+    public void useToilet() {
+        if (new Random().nextInt(10) < 2) {
+            System.out.println(this.getClass().getSimpleName() + " воспользовался туалетом");
+            if (currentRoom instanceof Tables) {
+                ((Tables) currentRoom).getToilet().getDirty();
+            } else if (currentRoom instanceof Bar) {
+                ((Bar) currentRoom).getToilet().getDirty();
+            }
+        }
     }
 
     @Override

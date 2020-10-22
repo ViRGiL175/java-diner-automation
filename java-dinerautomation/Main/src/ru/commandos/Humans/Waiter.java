@@ -1,12 +1,13 @@
 package ru.commandos.Humans;
 
-import com.google.gson.Gson;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import ru.commandos.Diner;
 import ru.commandos.Order;
 import ru.commandos.Rooms.*;
+
+import java.util.Random;
 
 public class Waiter extends Staff implements Observer<String> {
 
@@ -21,6 +22,7 @@ public class Waiter extends Staff implements Observer<String> {
     }
 
     public void acceptTablesOrder(Integer tableNumber) {
+        move(diner.getHall().getTables());
         diner.getHall().getTables().getClient(tableNumber).setMenu(diner.getMenu());
         order = diner.getHall().getTables().getClient(tableNumber).getOrder();
         if (order.cost == 0.) {
@@ -32,7 +34,8 @@ public class Waiter extends Staff implements Observer<String> {
         }
     }
 
-    public void acceptPitOrder() {
+    public void acceptDriveThruOrder() {
+        move(diner.getDriveThru());
         driveThru.getCar().setMenu(diner.getMenu());
         order = driveThru.getCar().getOrder();
         if (order.cost == 0.) {
@@ -45,11 +48,13 @@ public class Waiter extends Staff implements Observer<String> {
     }
 
     private void transferOrder(Order order) {
-        if (!order.food.isEmpty()) {
+        if (!order.dishes.isEmpty()) {
+            move(kitchen);
             System.out.println("Заказ передан в кухню");
             kitchen.acceptOrder(order);
         }
         if (!order.drinks.isEmpty()) {
+            move(diner.getHall().getBar());
             System.out.println("Заказ передан в бар");
             diner.getHall().getBar().acceptOrder(order);
         }
@@ -57,11 +62,13 @@ public class Waiter extends Staff implements Observer<String> {
 
     private void carryOrder(Order order) {
         System.out.println("Официант взял готовый заказ");
-        if (order.orderPlace == Room.orderPlace.DRIVETHRU) {
+        if (order.orderPlace == Room.OrderPlace.DRIVETHRU) {
+            move(driveThru);
             driveThru.getCar().setOrder(order);
             changeMoney(driveThru.carGone().pay());
             givePaymentToBookkeeper();
-        } else if (order.orderPlace == Room.orderPlace.TABLES) {
+        } else if (order.orderPlace == Room.OrderPlace.TABLES) {
+            move(diner.getHall().getTables());
             diner.getHall().getTables().getClient(order.table).setOrder(order);
             changeMoney(diner.getHall().getTables().getClient(order.table).pay());
             diner.getHall().getTables().clientGone(order.table);
@@ -69,16 +76,29 @@ public class Waiter extends Staff implements Observer<String> {
         } else {
             diner.getBarmen().setReadyOrder(order);
         }
+
+        useToilet();
+
     }
 
     private void transferOrderFromBar(Order order) {
+        move(kitchen);
         System.out.println("Заказ передан в кухню");
         kitchen.acceptOrder(order);
     }
 
     private void givePaymentToBookkeeper() {
-        diner.getBookkeeper().giveClientPayment(getDoubleMoney());
+        move(diner.getBookkeeping());
+        diner.getBookkeeper().giveClientPayment(getMoney());
         money = "$0";
+    }
+
+    @Override
+    public void useToilet() {
+        if (new Random().nextInt(10) < 2) {
+            System.out.println(this.getClass().getSimpleName() + " воспользовался туалетом");
+            diner.getHall().getToilet().getDirty();
+        }
     }
 
     @Override
@@ -88,22 +108,22 @@ public class Waiter extends Staff implements Observer<String> {
     @Override
     public void onNext(@NonNull String s) {
         if (s.equals(DriveThru.class.getSimpleName())) {
-            acceptPitOrder();
+            acceptDriveThruOrder();
         } else if (s.equals(Kitchen.class.getSimpleName())) {
-            order = kitchen.readyOrder.pollFirst();
+            order = kitchen.getReadyOrder();
             if (order.isready()) {
                 carryOrder(order);
             }
         } else if (s.equals(Bar.class.getSimpleName())) {
-            order = diner.getHall().getBar().readyOrder.pollFirst();
-            if (order.isready()) {
+            order = diner.getHall().getBar().getReadyOrder();
+            if (order.orderPlace == Room.OrderPlace.BAR) {
+                transferOrderFromBar(order);
+            } else if (order.isready()) {
                 carryOrder(order);
             }
-        } else if (s.substring(0, 6).equals(Tables.class.getSimpleName())) {
+        } else {
             Integer table = Integer.parseInt(new StringBuffer(s).delete(0, 6).toString());
             acceptTablesOrder(table);
-        } else {
-            transferOrderFromBar(new Gson().fromJson(s, Order.class));
         }
     }
 

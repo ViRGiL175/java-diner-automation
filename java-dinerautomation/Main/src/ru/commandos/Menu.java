@@ -1,17 +1,20 @@
 package ru.commandos;
 
+import ru.commandos.Food.Dish.*;
+import ru.commandos.Food.Drink.*;
+
 import java.util.HashMap;
 
 public class Menu {
 
-    public HashMap<String, Double> food = new HashMap<>();
-    public HashMap<String, Double> drinks = new HashMap<>();
+    public HashMap<Dish, Double> food = new HashMap<>();
+    public HashMap<Drink, Double> drinks = new HashMap<>();
 
     {
-        food.put("Пицца \"Гималайская\"", 99.99);
-        food.put("Рататуй", 79.99);
-        food.put("Летучая мышь во фритюре", 199.99);
-        drinks.put("Шампанское \"Советское\"", 149.99);
-        drinks.put("Какао \"Школьное\"", 39.99);
+        food.put(new HimalayanPizza(), 99.99);
+        food.put(new Ratatouille(), 79.99);
+        food.put(new DeepFriedBat(), 199.99);
+        drinks.put(new ChampagneSoviet(), 149.99);
+        drinks.put(new CocoaSchool(), 39.99);
     }
 }

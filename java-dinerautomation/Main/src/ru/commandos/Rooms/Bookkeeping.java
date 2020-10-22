@@ -14,20 +14,16 @@ public class Bookkeeping extends Room {
 
     public Bookkeeping(Diner diner) {
         this.diner = diner;
-        pay.put(diner.getCook(), 500.0);
-        pay.put(diner.getBookkeeper(), 400.0);
-        pay.put(diner.getBarmen(), 200.0);
-        pay.put(diner.getWaiter(), 100.0);
     }
 
     public void putMoneyInBudget(Double money) {
         budget += money;
-        System.out.println("Бюджет Дайнера: " + budget);
+        System.out.printf("Бюджет Дайнера: $%.2f\n", budget);
     }
 
     public Double getMoneyFromBudget(Double money) {
         budget -= money;
-        System.out.println("Бюджет Дайнера: " + budget);
+        System.out.printf("Бюджет Дайнера: $%.2f\n", budget);
         return money;
     }
 
@@ -37,5 +33,17 @@ public class Bookkeeping extends Room {
 
     public HashMap<Staff, Double> getStaffPayList() {
         return pay;
+    }
+
+    public void createPayMap() {
+        pay.put(diner.getCook(), 500.0);
+        pay.put(diner.getBookkeeper(), 400.0);
+        pay.put(diner.getBarmen(), 200.0);
+        pay.put(diner.getWaiter(), 100.0);
+    }
+
+    @Override
+    public void getDirty() {
+        diner.dirtCurrentRoom(this);
     }
 }
