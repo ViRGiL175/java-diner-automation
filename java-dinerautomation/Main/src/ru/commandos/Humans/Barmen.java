@@ -10,6 +10,8 @@ import ru.commandos.Order;
 import ru.commandos.Rooms.Bar;
 import ru.commandos.Rooms.Room;
 
+import java.util.Random;
+
 
 public class Barmen extends Staff implements Observer<String> {
 
@@ -18,6 +20,7 @@ public class Barmen extends Staff implements Observer<String> {
     public Barmen(Diner diner, Bar bar) {
         super(diner);
         this.bar = bar;
+        currentRoom = bar;
     }
 
     private void shake(Order order) {
@@ -29,7 +32,11 @@ public class Barmen extends Staff implements Observer<String> {
         }
         System.out.println("Ингредиентов осталось в баре: " + bar.checkIngredients());
         System.out.println("Бармен сделал напитки");
-        if (order.orderPlace != Room.orderPlace.BAR || !order.dishes.isEmpty()) {
+        currentRoom.getDirty();
+
+        useToilet();
+
+        if (order.orderPlace != Room.OrderPlace.BAR || !order.dishes.isEmpty()) {
             bar.transfer(order);
         }
         else {
@@ -67,8 +74,16 @@ public class Barmen extends Staff implements Observer<String> {
     }
 
     private void givePaymentToBookkeeper() {
-        diner.getBookkeeper().giveClientPayment(getDoubleMoney());
+        diner.getBookkeeper().giveClientPayment(getMoney());
         money = "$0";
+    }
+
+    @Override
+    public void useToilet() {
+        if (new Random().nextInt(10) < 2) {
+            System.out.println(this.getClass().getSimpleName() + " воспользовался туалетом");
+            diner.getHall().getToilet().getDirty();
+        }
     }
 
     @Override

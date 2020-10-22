@@ -1,6 +1,7 @@
 package ru.commandos.Rooms;
 
 import io.reactivex.rxjava3.subjects.PublishSubject;
+import ru.commandos.Diner;
 import ru.commandos.Humans.Cook;
 import ru.commandos.Humans.Waiter;
 import ru.commandos.Order;
@@ -10,6 +11,7 @@ import java.util.HashMap;
 
 public class Kitchen extends Room {
 
+    private final Diner diner;
     private final HashMap<String, Integer> ingredients = new HashMap<>();
 
     {
@@ -27,6 +29,10 @@ public class Kitchen extends Room {
 
     private final PublishSubject<Order> dashboard = PublishSubject.create();
     private final PublishSubject<String> bell = PublishSubject.create();
+
+    public Kitchen(Diner diner) {
+        this.diner = diner;
+    }
 
     public void subscribe(Cook cook) {
         dashboard.subscribe(cook);
@@ -59,5 +65,10 @@ public class Kitchen extends Room {
 
     public HashMap<String, Integer> checkIngredients() {
         return ingredients;
+    }
+  
+    @Override
+    public void getDirty() {
+        diner.dirtCurrentRoom(this);
     }
 }

@@ -17,6 +17,7 @@ public class Bookkeeper extends Staff implements Observer<Date> {
     public Bookkeeper(Diner diner, Bookkeeping bookkeeping) {
         super(diner);
         this.bookkeeping = bookkeeping;
+        currentRoom = bookkeeping;
         System.out.println("Мы наняли лучшего бухгалтера, чтобы дела шли в гору!");
     }
 
@@ -50,6 +51,14 @@ public class Bookkeeper extends Staff implements Observer<Date> {
 
     public void giveClientPayment(Double payment) {
         bookkeeping.putMoneyInBudget(payment);
+    }
+
+    @Override
+    public void useToilet() {
+        if (new Random().nextInt(10) < 2) {
+            System.out.println(this.getClass().getSimpleName() + " воспользовался туалетом");
+            diner.getHall().getToilet().getDirty();
+        }
     }
 
     @Override
@@ -90,6 +99,10 @@ public class Bookkeeper extends Staff implements Observer<Date> {
                 diner.getHall().getBar().setIngredients(ingredient, countIngredientToBuy);
             }
         }
+        currentRoom.getDirty();
+
+        useToilet();
+
     }
 
     @Override

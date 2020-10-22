@@ -5,6 +5,7 @@ import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
+import ru.commandos.Diner;
 import ru.commandos.Humans.Client;
 import ru.commandos.Humans.Waiter;
 
@@ -12,8 +13,13 @@ import java.util.ArrayDeque;
 
 public class DriveThru extends Room implements Observer<String> {
 
+    private final Diner diner;
     private final ArrayDeque<Client> cars = new ArrayDeque<>();
     private final PublishSubject<String> caller = PublishSubject.create();
+
+    public DriveThru(Diner diner) {
+        this.diner = diner;
+    }
 
     public Client getCar() {
         return cars.getFirst();
@@ -29,6 +35,11 @@ public class DriveThru extends Room implements Observer<String> {
     }
 
     @Override
+    public void getDirty() {
+        diner.dirtCurrentRoom(this);
+    }
+
+    @Override
     public void onSubscribe(@NonNull Disposable d) {
         System.out.println("Драйв-тру открыт");
     }
@@ -37,8 +48,9 @@ public class DriveThru extends Room implements Observer<String> {
     public void onNext(@NonNull String s) {
         Gson gson = new Gson();
         Client client = gson.fromJson(s, Client.class);
+        client.move(this);
         cars.add(client);
-        client.setOrderPlace(orderPlace.DRIVETHRU);
+        client.setOrderPlace(OrderPlace.DRIVETHRU);
         caller.onNext(DriveThru.class.getSimpleName());
     }
 
@@ -49,6 +61,6 @@ public class DriveThru extends Room implements Observer<String> {
 
     @Override
     public void onComplete() {
-        System.out.println("Питстоп закрыт");
+        System.out.println("Драйв-тру закрыт");
     }
 }

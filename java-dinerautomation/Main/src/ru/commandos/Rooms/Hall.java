@@ -9,16 +9,18 @@ import ru.commandos.Humans.Client;
 
 import java.util.Random;
 
-public class Hall extends Room implements Observer<String> {
+public class Hall implements Observer<String> {
 
     private final Diner diner;
-    protected Tables tables;
-    protected Bar bar;
+    private final Tables tables;
+    private final Bar bar;
+    private final Toilet toilet;
 
     public Hall(Diner diner) {
         this.diner = diner;
-        tables = new Tables();
-        bar = new Bar();
+        tables = new Tables(diner);
+        bar = new Bar(diner);
+        toilet = new Toilet(diner);
     }
 
     public Tables getTables() {
@@ -27,6 +29,10 @@ public class Hall extends Room implements Observer<String> {
 
     public Bar getBar() {
         return bar;
+    }
+
+    public Toilet getToilet() {
+        return toilet;
     }
 
     @Override

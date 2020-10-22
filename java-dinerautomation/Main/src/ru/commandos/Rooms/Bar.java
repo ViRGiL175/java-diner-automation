@@ -1,6 +1,7 @@
 package ru.commandos.Rooms;
 
 import io.reactivex.rxjava3.subjects.PublishSubject;
+import ru.commandos.Diner;
 import ru.commandos.Humans.Barmen;
 import ru.commandos.Humans.Client;
 import ru.commandos.Humans.Waiter;
@@ -10,6 +11,7 @@ import java.util.*;
 
 public class Bar extends Room {
 
+    private final Diner diner;
     private final HashMap<String, Integer> ingredients = new HashMap<>();
 
     {
@@ -35,6 +37,10 @@ public class Bar extends Room {
     private final PublishSubject<String> barmenCaller = PublishSubject.create();
     private final PublishSubject<String> waiterCaller = PublishSubject.create();
 
+    public Bar(Diner diner) {
+        this.diner = diner;
+    }
+
     public void acceptOrder(Order order) {
         waitOrder.add(order);
         barmenCaller.onNext(Waiter.class.getSimpleName());
@@ -46,10 +52,11 @@ public class Bar extends Room {
     }
 
     public void setClient(Client client) {
+        client.move(this);
         if (!freePlace.isEmpty()) {
             int random = new Random().nextInt(freePlace.size());
             Integer chair = new ArrayList<>(freePlace).get(random);
-            client.setOrderPlace(orderPlace.BAR);
+            client.setOrderPlace(OrderPlace.BAR);
             client.setTable(chair);
             chairs.set(chair, client);
             freePlace.remove(chair);
@@ -96,5 +103,14 @@ public class Bar extends Room {
 
     public void subscribe(Barmen barmen) {
         barmenCaller.subscribe(barmen);
+    }
+
+    public Toilet getToilet() {
+        return diner.getHall().getToilet();
+    }
+
+    @Override
+    public void getDirty() {
+        diner.dirtCurrentRoom(this);
     }
 }

@@ -12,11 +12,11 @@ public class Order {
     public HashSet<Drink> drinks;
     public HashSet<Dish> doneDishes = new HashSet<>();
     public HashSet<Drink> doneDrinks = new HashSet<>();
-    public Room.orderPlace orderPlace;
+    public Room.OrderPlace orderPlace;
     public Integer table;
     public Double cost = 0.;
 
-    public Order(HashSet<Dish> dishes, HashSet<Drink> drinks, Menu menu, Room.orderPlace orderPlace, Integer table, Double cost) {
+    public Order(HashSet<Dish> dishes, HashSet<Drink> drinks, Menu menu, Room.OrderPlace orderPlace, Integer table, Double cost) {
         this.dishes = dishes;
         this.drinks = drinks;
         this.orderPlace = orderPlace;
@@ -35,7 +35,7 @@ public class Order {
                 ", drinks=" + drinks +
                 ", doneFood=" + doneDishes +
                 ", doneDrinks=" + doneDrinks +
-                ((orderPlace == Room.orderPlace.DRIVETHRU)
+                ((orderPlace == Room.OrderPlace.DRIVETHRU)
                         ? (", orderPlace=" + orderPlace.name())
                         : (", orderPlace=" + orderPlace.name() + ", table=" + table)) +
                 ", cost=" + cost +
