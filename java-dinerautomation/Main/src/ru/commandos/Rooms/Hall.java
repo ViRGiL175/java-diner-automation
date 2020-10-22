@@ -11,7 +11,7 @@ import java.util.Random;
 
 public class Hall extends Room implements Observer<String> {
 
-    private Diner diner;
+    private final Diner diner;
     protected Tables tables;
     protected Bar bar;
 
