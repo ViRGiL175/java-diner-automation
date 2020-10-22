@@ -1,5 +1,7 @@
 package ru.commandos.Humans;
 
+import ru.commandos.Food.Dish.Dish;
+import ru.commandos.Food.Drink.Drink;
 import ru.commandos.Menu;
 import ru.commandos.Order;
 import ru.commandos.Rooms.Room;
@@ -39,11 +41,11 @@ public class Client extends Human {
             drink = random.nextInt(menu.drinks.size() + 1);
         }
 
-        ArrayList<String> menuFood = new ArrayList<>(menu.food.keySet());
-        ArrayList<String> menuDrinks = new ArrayList<>(menu.drinks.keySet());
+        ArrayList<Dish> menuFood = new ArrayList<>(menu.food.keySet());
+        ArrayList<Drink> menuDrinks = new ArrayList<>(menu.drinks.keySet());
 
-        HashSet<String> orderFood = new HashSet<>();
-        HashSet<String> orderDrinks = new HashSet<>();
+        HashSet<Dish> orderFood = new HashSet<>();
+        HashSet<Drink> orderDrinks = new HashSet<>();
         Double cost = 0.;
 
         for (int i = 0; i < foods; i++) {
@@ -66,7 +68,7 @@ public class Client extends Human {
 
     public void setOrder(Order order) {
         if (!this.order.equals(order)) {
-            System.out.println("Официант ошибся с заказом :(");
+            System.err.println("Официант ошибся с заказом :(");
         } else {
             System.out.println("Клиент получил заказ");
         }

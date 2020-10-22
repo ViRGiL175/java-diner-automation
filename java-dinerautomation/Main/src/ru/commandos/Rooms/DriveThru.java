@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.subjects.ReplaySubject;
+import io.reactivex.rxjava3.subjects.PublishSubject;
 import ru.commandos.Humans.Client;
 import ru.commandos.Humans.Waiter;
 
@@ -13,7 +13,7 @@ import java.util.ArrayDeque;
 public class DriveThru extends Room implements Observer<String> {
 
     private final ArrayDeque<Client> cars = new ArrayDeque<>();
-    private final ReplaySubject<String> caller = ReplaySubject.create();
+    private final PublishSubject<String> caller = PublishSubject.create();
 
     public Client getCar() {
         return cars.getFirst();

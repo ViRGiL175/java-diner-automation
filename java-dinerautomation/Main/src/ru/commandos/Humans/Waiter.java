@@ -45,7 +45,7 @@ public class Waiter extends Staff implements Observer<String> {
     }
 
     private void transferOrder(Order order) {
-        if (!order.food.isEmpty()) {
+        if (!order.dishes.isEmpty()) {
             System.out.println("Заказ передан в кухню");
             kitchen.acceptOrder(order);
         }
@@ -90,20 +90,21 @@ public class Waiter extends Staff implements Observer<String> {
         if (s.equals(DriveThru.class.getSimpleName())) {
             acceptPitOrder();
         } else if (s.equals(Kitchen.class.getSimpleName())) {
-            order = kitchen.readyOrder.pollFirst();
+            order = kitchen.getReadyOrder();
             if (order.isready()) {
                 carryOrder(order);
             }
         } else if (s.equals(Bar.class.getSimpleName())) {
-            order = diner.getHall().getBar().readyOrder.pollFirst();
-            if (order.isready()) {
+            order = diner.getHall().getBar().getReadyOrder();
+            if (order.orderPlace == Room.orderPlace.BAR) {
+                transferOrderFromBar(order);
+            }
+            else if (order.isready()) {
                 carryOrder(order);
             }
-        } else if (s.substring(0, 6).equals(Tables.class.getSimpleName())) {
+        } else {
             Integer table = Integer.parseInt(new StringBuffer(s).delete(0, 6).toString());
             acceptTablesOrder(table);
-        } else {
-            transferOrderFromBar(new Gson().fromJson(s, Order.class));
         }
     }
 
