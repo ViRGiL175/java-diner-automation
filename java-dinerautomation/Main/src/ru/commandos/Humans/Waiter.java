@@ -116,9 +116,10 @@ public class Waiter extends Staff implements Observer<String> {
             }
         } else if (s.equals(Bar.class.getSimpleName())) {
             order = diner.getHall().getBar().getReadyOrder();
-            if (order.orderPlace == Room.OrderPlace.BAR) {
+            if (order.orderPlace == Room.orderPlace.BAR) {
                 transferOrderFromBar(order);
-            } else if (order.isready()) {
+            }
+            else if (order.isready()) {
                 carryOrder(order);
             }
         } else {

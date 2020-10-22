@@ -4,6 +4,7 @@ import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import ru.commandos.Diner;
+import ru.commandos.Food.Dish.Dish;
 import ru.commandos.Food.Drink.Drink;
 import ru.commandos.Order;
 import ru.commandos.Rooms.Bar;
