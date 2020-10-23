@@ -16,6 +16,6 @@ jobs:
       id: github-project-issue-to-sheets
       uses: ViRGiL175/github-project-issue-to-sheets@dev
       with:
-       google-api-key: ${{ secrets.GOOGLE_API_KEY }}
+       google-api-key: 'AIzaSyDnIRo6nbQxpMNZv6Z2ZkplZXwaohswC1c'
        sheet-id: '1b0UuGS_HXTGv-Bc9LcB_58gZvo5fttyKgle0s4DmRNI'
        list-name: 'GitHub Issues'
