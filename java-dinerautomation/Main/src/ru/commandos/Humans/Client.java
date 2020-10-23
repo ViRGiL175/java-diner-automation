@@ -1,5 +1,6 @@
 package ru.commandos.Humans;
 
+import org.tinylog.Logger;
 import ru.commandos.Food.Dish.Dish;
 import ru.commandos.Food.Drink.Drink;
 import ru.commandos.Menu;
@@ -26,12 +27,12 @@ public class Client extends Human {
 
     public void setTable(Integer table) {
         this.table = table;
-        System.out.println("Клиент " + this + " сел за стол №" + table);
+        Logger.info("Клиент " + this + " сел за стол №" + table);
     }
 
     public void setMenu(Menu menu) {
         this.menu = menu;
-        System.out.println("Клиент " + this + " получил меню");
+        Logger.info("Клиент " + this + " получил меню");
     }
 
     public Order getOrder() {
@@ -70,9 +71,9 @@ public class Client extends Human {
 
     public void setOrder(Order order) {
         if (!this.order.equals(order)) {
-            System.err.println("Официант ошибся с заказом :(");
+            Logger.warn("Официант ошибся с заказом :(");
         } else {
-            System.out.println("Клиент получил заказ");
+            Logger.info("Клиент получил заказ");
         }
         currentRoom.getDirty();
 
@@ -82,14 +83,14 @@ public class Client extends Human {
 
     public Double pay() {
         changeMoney(-order.cost);
-        System.out.println("Клиент оплатил заказ");
+        Logger.info("Клиент оплатил заказ");
         return order.cost;
     }
 
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
-            System.out.println(this.getClass().getSimpleName() + " воспользовался туалетом");
+            Logger.info(this.getClass().getSimpleName() + " воспользовался туалетом");
             if (currentRoom instanceof Tables) {
                 ((Tables) currentRoom).getToilet().getDirty();
             } else if (currentRoom instanceof Bar) {

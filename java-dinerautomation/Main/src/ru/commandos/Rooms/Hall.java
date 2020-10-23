@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
+import org.tinylog.Logger;
 import ru.commandos.Diner;
 import ru.commandos.Humans.Client;
 
@@ -37,7 +38,7 @@ public class Hall implements Observer<String> {
 
     @Override
     public void onSubscribe(@NonNull Disposable d) {
-        System.out.println("Зал открыт");
+        Logger.info("Зал открыт");
         bar.subscribe(diner.getBarmen());
         bar.subscribe(diner.getWaiter());
         tables.subscribe(diner.getWaiter());
@@ -62,6 +63,6 @@ public class Hall implements Observer<String> {
 
     @Override
     public void onComplete() {
-        System.out.println("Зал закрыт");
+        Logger.warn("Зал закрыт");
     }
 }

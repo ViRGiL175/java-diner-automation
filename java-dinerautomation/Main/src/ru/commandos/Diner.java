@@ -2,6 +2,7 @@ package ru.commandos;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
+import org.tinylog.Logger;
 import ru.commandos.Humans.*;
 import ru.commandos.Rooms.*;
 
@@ -52,7 +53,7 @@ public class Diner {
 
     public Diner(Observable<String> jsonObservable, Observable<Date> dateObservable) {
         bookkeeping.createPayMap();
-        System.out.println("Дайнер начал работу");
+        Logger.info("Дайнер начал работу");
         kitchen.subscribe(cook);
         kitchen.subscribe(waiter);
         cleanerCaller.subscribe(cleaner);
@@ -66,14 +67,14 @@ public class Diner {
         int dirt = roomDirt.get(room) + new Random().nextInt(maxRoomDirtSpeed.get(room) + 1);
         roomDirt.replace(room, dirt);
         if (roomDirt.get(room) >= maxRoomDirt.get(room)) {
-            System.out.println("Критический уровень загрязнения в " + room.getClass().getSimpleName() + ": " + dirt);
+            Logger.warn("Критический уровень загрязнения в " + room.getClass().getSimpleName() + ": " + dirt);
             cleanerCaller.onNext(room);
         }
     }
 
     public void clean(Room room) {
         roomDirt.replace(room, 0);
-        System.out.println("Уборщик прибрался в " + room.getClass().getSimpleName());
+        Logger.info("Уборщик прибрался в " + room.getClass().getSimpleName());
     }
 
     public Menu getMenu() {

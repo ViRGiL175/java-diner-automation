@@ -3,6 +3,7 @@ package ru.commandos.Humans;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
+import org.tinylog.Logger;
 import ru.commandos.Diner;
 import ru.commandos.Food.Dish.Dish;
 import ru.commandos.Order;
@@ -22,7 +23,7 @@ public class Cook extends Staff implements Observer<Order> {
     }
 
     private void cook(Order order) {
-        System.out.println("Повар готовит");
+        Logger.debug("Повар готовит");
         for (Dish dish : order.dishes) {
             for (String ingredient : dish.getIngredients().keySet()) {
                 kitchen.getIngredients(ingredient, dish.getIngredients().get(ingredient));
@@ -33,22 +34,22 @@ public class Cook extends Staff implements Observer<Order> {
 
         useToilet();
 
-        System.out.println("Ингредиентов осталось на кухне: " + kitchen.checkIngredients());
-        System.out.println("Повар приготовил блюда");
+        Logger.info("Ингредиентов осталось на кухне: " + kitchen.checkIngredients());
+        Logger.debug("Повар приготовил блюда");
         kitchen.transferDish(order);
     }
 
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
-            System.out.println(this.getClass().getSimpleName() + " воспользовался туалетом");
+            Logger.info(this.getClass().getSimpleName() + " воспользовался туалетом");
             diner.getHall().getToilet().getDirty();
         }
     }
 
     @Override
     public void onSubscribe(@NonNull Disposable d) {
-        System.out.println("Повар готов творить чудеса кулинарии");
+        Logger.info("Повар готов творить чудеса кулинарии");
     }
 
     @Override
@@ -63,6 +64,6 @@ public class Cook extends Staff implements Observer<Order> {
 
     @Override
     public void onComplete() {
-        System.out.println("Повар больше не может готовить");
+        Logger.warn("Повар больше не может готовить");
     }
 }

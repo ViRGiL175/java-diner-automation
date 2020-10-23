@@ -5,6 +5,7 @@ import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
+import org.tinylog.Logger;
 import ru.commandos.Diner;
 import ru.commandos.Humans.Client;
 import ru.commandos.Humans.Waiter;
@@ -31,7 +32,7 @@ public class DriveThru extends Room implements Observer<String> {
 
     public void subscribe(Waiter waiter) {
         caller.subscribe(waiter);
-        System.out.println("Официант готов принимать заказы на Драйв-тру");
+        Logger.info("Официант готов принимать заказы на Драйв-тру");
     }
 
     @Override
@@ -61,6 +62,6 @@ public class DriveThru extends Room implements Observer<String> {
 
     @Override
     public void onComplete() {
-        System.out.println("Драйв-тру закрыт");
+        Logger.warn("Драйв-тру закрыт");
     }
 }

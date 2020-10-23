@@ -3,6 +3,7 @@ package ru.commandos.Humans;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
+import org.tinylog.Logger;
 import ru.commandos.Diner;
 import ru.commandos.Order;
 import ru.commandos.Rooms.*;
@@ -26,10 +27,10 @@ public class Waiter extends Staff implements Observer<String> {
         diner.getHall().getTables().getClient(tableNumber).setMenu(diner.getMenu());
         order = diner.getHall().getTables().getClient(tableNumber).getOrder();
         if (order.cost == 0.) {
-            System.out.println("Клиент ничего не заказал");
+            Logger.info("Клиент ничего не заказал");
             diner.getHall().getTables().clientGone(order.table);
         } else {
-            System.out.println("Официант взял заказ в Зале: " + order);
+            Logger.info("Официант взял заказ в Зале: " + order);
             transferOrder(order);
         }
     }
@@ -39,10 +40,10 @@ public class Waiter extends Staff implements Observer<String> {
         driveThru.getCar().setMenu(diner.getMenu());
         order = driveThru.getCar().getOrder();
         if (order.cost == 0.) {
-            System.out.println("Клиент ничего не заказал");
+            Logger.info("Клиент ничего не заказал");
             driveThru.carGone();
         } else {
-            System.out.println("Официант взял заказ на Драйв-тру: " + order);
+            Logger.info("Официант взял заказ на Драйв-тру: " + order);
             transferOrder(order);
         }
     }
@@ -50,18 +51,18 @@ public class Waiter extends Staff implements Observer<String> {
     private void transferOrder(Order order) {
         if (!order.dishes.isEmpty()) {
             move(kitchen);
-            System.out.println("Заказ передан в кухню");
+            Logger.debug("Заказ передан в кухню");
             kitchen.acceptOrder(order);
         }
         if (!order.drinks.isEmpty()) {
             move(diner.getHall().getBar());
-            System.out.println("Заказ передан в бар");
+            Logger.debug("Заказ передан в бар");
             diner.getHall().getBar().acceptOrder(order);
         }
     }
 
     private void carryOrder(Order order) {
-        System.out.println("Официант взял готовый заказ");
+        Logger.debug("Официант взял готовый заказ");
         if (order.orderPlace == Room.OrderPlace.DRIVETHRU) {
             move(driveThru);
             driveThru.getCar().setOrder(order);
@@ -83,7 +84,7 @@ public class Waiter extends Staff implements Observer<String> {
 
     private void transferOrderFromBar(Order order) {
         move(kitchen);
-        System.out.println("Заказ передан в кухню");
+        Logger.debug("Заказ передан в кухню");
         kitchen.acceptOrder(order);
     }
 
@@ -96,7 +97,7 @@ public class Waiter extends Staff implements Observer<String> {
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
-            System.out.println(this.getClass().getSimpleName() + " воспользовался туалетом");
+            Logger.info(this.getClass().getSimpleName() + " воспользовался туалетом");
             diner.getHall().getToilet().getDirty();
         }
     }
@@ -116,7 +117,7 @@ public class Waiter extends Staff implements Observer<String> {
             }
         } else if (s.equals(Bar.class.getSimpleName())) {
             order = diner.getHall().getBar().getReadyOrder();
-            if (order.orderPlace == Room.orderPlace.BAR) {
+            if (order.orderPlace == Room.OrderPlace.BAR) {
                 transferOrderFromBar(order);
             }
             else if (order.isready()) {
@@ -135,6 +136,6 @@ public class Waiter extends Staff implements Observer<String> {
 
     @Override
     public void onComplete() {
-        System.out.println("Официант больше не может принимать заказы");
+        Logger.warn("Официант больше не может принимать заказы");
     }
 }

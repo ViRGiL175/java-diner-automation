@@ -1,5 +1,6 @@
 package ru.commandos.Rooms;
 
+import org.tinylog.Logger;
 import ru.commandos.Diner;
 import ru.commandos.Humans.Staff;
 
@@ -18,12 +19,12 @@ public class Bookkeeping extends Room {
 
     public void putMoneyInBudget(Double money) {
         budget += money;
-        System.out.printf("Бюджет Дайнера: $%.2f\n", budget);
+        Logger.info(String.format("Бюджет Дайнера: $%.2f\n", budget));
     }
 
     public Double getMoneyFromBudget(Double money) {
         budget -= money;
-        System.out.printf("Бюджет Дайнера: $%.2f\n", budget);
+        Logger.info(String.format("Бюджет Дайнера: $%.2f\n", budget));
         return money;
     }
 
