@@ -3,6 +3,7 @@ package ru.commandos.Humans;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
+import org.tinylog.Logger;
 import ru.commandos.Diner;
 import ru.commandos.Rooms.Room;
 
@@ -17,14 +18,14 @@ public class Cleaner extends Staff implements Observer<Room> {
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
-            System.out.println(this.getClass().getSimpleName() + " воспользовался туалетом");
+            Logger.info(this.getClass().getSimpleName() + " воспользовался туалетом");
             diner.getHall().getToilet().getDirty();
         }
     }
 
     @Override
     public void onSubscribe(@NonNull Disposable d) {
-        System.out.println("Уборщик готов драить до блеска");
+        Logger.info("Уборщик готов драить до блеска");
     }
 
     @Override
@@ -43,6 +44,6 @@ public class Cleaner extends Staff implements Observer<Room> {
 
     @Override
     public void onComplete() {
-        System.out.println("Уборщик наелся и спит");
+        Logger.warn("Уборщик наелся и спит");
     }
 }

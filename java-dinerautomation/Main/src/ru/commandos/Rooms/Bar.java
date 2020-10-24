@@ -1,6 +1,7 @@
 package ru.commandos.Rooms;
 
 import io.reactivex.rxjava3.subjects.PublishSubject;
+import org.tinylog.Logger;
 import ru.commandos.Diner;
 import ru.commandos.Humans.Barmen;
 import ru.commandos.Humans.Client;
@@ -60,17 +61,17 @@ public class Bar extends Room {
             client.setTable(chair);
             chairs.set(chair, client);
             freePlace.remove(chair);
-            System.out.println("Клиент " + client + " готов сделать заказ в баре!");
+            Logger.info("Клиент " + client + " готов сделать заказ в баре!");
             barmenCaller.onNext(Bar.class.getSimpleName() + chair);
         } else {
-            System.out.println("Мест нет!");
+            Logger.info("Мест нет!");
         }
     }
 
     public void clientGone(Integer chair) {
         chairs.set(chair, null);
         freePlace.add(chair);
-        System.out.println("Клиент ушёл, стул №" + chair + " освободился");
+        Logger.info("Клиент ушёл, стул №" + chair + " освободился");
     }
 
     public void getIngredients(String ingredient, Integer count) {

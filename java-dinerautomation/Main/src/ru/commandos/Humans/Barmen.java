@@ -3,8 +3,8 @@ package ru.commandos.Humans;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
+import org.tinylog.Logger;
 import ru.commandos.Diner;
-import ru.commandos.Food.Dish.Dish;
 import ru.commandos.Food.Drink.Drink;
 import ru.commandos.Order;
 import ru.commandos.Rooms.Bar;
@@ -30,8 +30,8 @@ public class Barmen extends Staff implements Observer<String> {
             }
             order.doneDrinks.add(drink);
         }
-        System.out.println("Ингредиентов осталось в баре: " + bar.checkIngredients());
-        System.out.println("Бармен сделал напитки");
+        Logger.debug("Ингредиентов осталось в баре: " + bar.checkIngredients());
+        Logger.debug("Бармен сделал напитки");
         currentRoom.getDirty();
 
         useToilet();
@@ -48,10 +48,10 @@ public class Barmen extends Staff implements Observer<String> {
         bar.getClient(chairNumber).setMenu(diner.getMenu());
         Order order = bar.getClient(chairNumber).getOrder();
         if (order.cost == 0.) {
-            System.out.println("Клиент ничего не заказал");
+            Logger.info("Клиент ничего не заказал");
             bar.clientGone(order.table);
         } else {
-            System.out.println("Бармен взял заказ в баре: " + order);
+            Logger.info("Бармен взял заказ в баре: " + order);
             transferOrder(order);
         }
     }
@@ -66,7 +66,7 @@ public class Barmen extends Staff implements Observer<String> {
     }
 
     public void setReadyOrder(Order order) {
-        System.out.println("Бармен отдаёт заказ клиенту");
+        Logger.debug("Бармен отдаёт заказ клиенту");
         bar.getClient(order.table).setOrder(order);
         changeMoney(bar.getClient(order.table).pay());
         bar.clientGone(order.table);
@@ -81,14 +81,14 @@ public class Barmen extends Staff implements Observer<String> {
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
-            System.out.println(this.getClass().getSimpleName() + " воспользовался туалетом");
+            Logger.info(this.getClass().getSimpleName() + " воспользовался туалетом");
             diner.getHall().getToilet().getDirty();
         }
     }
 
     @Override
     public void onSubscribe(@NonNull Disposable d) {
-        System.out.println("Бармен готов спаивать посетителей");
+        Logger.info("Бармен готов спаивать посетителей");
     }
 
     @Override
@@ -109,6 +109,6 @@ public class Barmen extends Staff implements Observer<String> {
 
     @Override
     public void onComplete() {
-        System.out.println("Бармен больше не наливает");
+        Logger.warn("Бармен больше не наливает");
     }
 }
