@@ -3,14 +3,15 @@ plugins {
 }
 
 group = "ru.commandos"
-version = "1.0.0"
+version = "1.0"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testCompile("junit", "junit", "4.12")
+    implementation(fileTree(mapOf("dir" to "lib", "include" to listOf("*.jar"))))
+    implementation(files("/src/main/java/ru/virgil/java-diner-signal-source-2.2.0.jar"))
 }
 
 configure<JavaPluginConvention> {

@@ -34,7 +34,7 @@ public class Cook extends Staff implements Observer<Order> {
 
         useToilet();
 
-        Logger.info("Ингредиентов осталось на кухне: " + kitchen.checkIngredients());
+        Logger.info("ингредиентов осталось на кухне: " + kitchen.checkIngredients());
         Logger.debug("Повар приготовил блюда");
         kitchen.transferDish(order);
     }

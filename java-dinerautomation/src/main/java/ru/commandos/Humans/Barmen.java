@@ -30,7 +30,7 @@ public class Barmen extends Staff implements Observer<String> {
             }
             order.doneDrinks.add(drink);
         }
-        Logger.debug("Ингредиентов осталось в баре: " + bar.checkIngredients());
+        Logger.debug("ингредиентов осталось в баре: " + bar.checkIngredients());
         Logger.debug("Бармен сделал напитки");
         currentRoom.getDirty();
 
