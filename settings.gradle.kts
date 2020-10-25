@@ -1,2 +1,2 @@
-rootProject.name = "java-dinerautomation"
+rootProject.name = "java-diner-automation"
 
