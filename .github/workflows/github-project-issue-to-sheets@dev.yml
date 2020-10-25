@@ -11,7 +11,7 @@ on:
    
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
- github-project-issue-sorter:
+ github-project-issue-to-sheets:
     runs-on: ubuntu-latest
     name: github-project-issue-to-sheets
     steps:
