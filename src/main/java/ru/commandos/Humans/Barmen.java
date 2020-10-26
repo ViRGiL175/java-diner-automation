@@ -69,8 +69,14 @@ public class Barmen extends Staff implements Observer<String> {
         Logger.debug("Бармен отдаёт заказ клиенту");
         bar.getClient(order.table).setOrder(order);
         changeMoney(bar.getClient(order.table).pay());
-        bar.clientGone(order.table);
         givePaymentToBookkeeper();
+
+        if(new Random().nextInt(10) > 3) {
+            bar.clientGone(order.table);
+        }
+        else {
+            diner.getBarmen().acceptOrder(order.table);
+        }
     }
 
     private void givePaymentToBookkeeper() {
