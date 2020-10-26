@@ -11,7 +11,7 @@ repositories {
 
 // Fix for encoding problems
 tasks.withType<JavaCompile> {
-    options.encoding = "windows-1251"
+    options.encoding = "UTF-8"
 }
 
 dependencies {
