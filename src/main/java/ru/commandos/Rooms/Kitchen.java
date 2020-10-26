@@ -66,7 +66,7 @@ public class Kitchen extends Room {
     public HashMap<String, Integer> checkIngredients() {
         return ingredients;
     }
-  
+
     @Override
     public void getDirty() {
         diner.dirtCurrentRoom(this);

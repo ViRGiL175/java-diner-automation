@@ -42,7 +42,7 @@ public class Bookkeeping extends Room {
         pay.put(diner.getBarmen(), 200.0);
         pay.put(diner.getWaiter(), 100.0);
     }
-  
+
     @Override
     public void getDirty() {
         diner.dirtCurrentRoom(this);
