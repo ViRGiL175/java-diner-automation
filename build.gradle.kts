@@ -1,5 +1,5 @@
 plugins {
-    java
+    application
 }
 
 group = "ru.commandos"
@@ -7,6 +7,10 @@ version = "1.0.0"
 
 repositories {
     mavenCentral()
+}
+
+application {
+    mainClass.set("ru.commandos.Main")
 }
 
 // Fix for encoding problems
