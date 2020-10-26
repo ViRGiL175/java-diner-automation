@@ -1,5 +1,6 @@
 package ru.commandos.Rooms;
 
+import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import org.tinylog.Logger;
 import ru.commandos.Diner;
@@ -9,6 +10,7 @@ import ru.commandos.Humans.Waiter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 public class Tables extends Room {
 
@@ -47,8 +49,10 @@ public class Tables extends Room {
             client.setTable(table);
             tables.set(table, client);
             freePlace.remove(table);
-            Logger.info("Клиент " + client + " готов сделать заказ в зале!");
-            caller.onNext(Tables.class.getSimpleName() + table);
+            Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+                Logger.info("Клиент " + client + " готов сделать заказ в зале!");
+                caller.onNext(Tables.class.getSimpleName() + table);
+            });
         } else {
             Logger.warn("Мест нет!");
         }

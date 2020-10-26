@@ -1,6 +1,7 @@
 package ru.commandos.Humans;
 
 import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import org.tinylog.Logger;
@@ -9,6 +10,7 @@ import ru.commandos.Order;
 import ru.commandos.Rooms.*;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 public class Waiter extends Staff implements Observer<String> {
 
@@ -23,82 +25,103 @@ public class Waiter extends Staff implements Observer<String> {
     }
 
     public void acceptTablesOrder(Integer tableNumber) {
-        move(diner.getHall().getTables());
-        diner.getHall().getTables().getClient(tableNumber).setMenu(diner.getMenu());
-        order = diner.getHall().getTables().getClient(tableNumber).getOrder();
-        if (order.cost == 0.) {
-            Logger.info("Клиент ничего не заказал");
-            diner.getHall().getTables().clientGone(order.table);
-        } else {
-            Logger.info("Официант взял заказ в Зале: " + order);
-            transferOrder(order);
-        }
+        Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+            move(diner.getHall().getTables());
+            diner.getHall().getTables().getClient(tableNumber).setMenu(diner.getMenu());
+            order = diner.getHall().getTables().getClient(tableNumber).getOrder();
+            if (order.cost == 0.) {
+                Logger.info("Клиент ничего не заказал");
+                diner.getHall().getTables().clientGone(order.table);
+            } else {
+                Logger.info("Официант взял заказ в Зале: " + order);
+                transferOrder(order);
+            }
+        });
     }
 
     public void acceptDriveThruOrder() {
-        move(diner.getDriveThru());
-        driveThru.getCar().setMenu(diner.getMenu());
-        order = driveThru.getCar().getOrder();
-        if (order.cost == 0.) {
-            Logger.info("Клиент ничего не заказал");
-            driveThru.carGone();
-        } else {
-            Logger.info("Официант взял заказ на Драйв-тру: " + order);
-            transferOrder(order);
-        }
+        Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+            move(diner.getDriveThru());
+            driveThru.getCar().setMenu(diner.getMenu());
+            order = driveThru.getCar().getOrder();
+            if (order.cost == 0.) {
+                Logger.info("Клиент ничего не заказал");
+                driveThru.carGone();
+            } else {
+                Logger.info("Официант взял заказ на Драйв-тру: " + order);
+                transferOrder(order);
+            }
+        });
     }
 
     private void transferOrder(Order order) {
-        if (!order.dishes.isEmpty()) {
-            move(kitchen);
-            Logger.debug("Заказ передан в кухню");
-            kitchen.acceptOrder(order);
-        }
-        if (!order.drinks.isEmpty()) {
-            move(diner.getHall().getBar());
-            Logger.debug("Заказ передан в бар");
-            diner.getHall().getBar().acceptOrder(order);
-        }
+        Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+            if (!order.dishes.isEmpty()) {
+                move(kitchen);
+                Logger.debug("Заказ передан в кухню " + order);
+                kitchen.acceptOrder(order);
+            }
+            if (!order.drinks.isEmpty()) {
+                move(diner.getHall().getBar());
+                Logger.debug("Заказ передан в бар " + order);
+                diner.getHall().getBar().acceptOrder(order);
+            }
+        });
     }
 
     private void carryOrder(Order order) {
         Logger.debug("Официант взял готовый заказ");
-        if (order.orderPlace == Room.OrderPlace.DRIVETHRU) {
-            move(driveThru);
-            driveThru.getCar().setOrder(order);
-            changeMoney(driveThru.carGone().pay());
-            givePaymentToBookkeeper();
-        } else if (order.orderPlace == Room.OrderPlace.TABLES) {
-            move(diner.getHall().getTables());
-            diner.getHall().getTables().getClient(order.table).setOrder(order);
-            changeMoney(diner.getHall().getTables().getClient(order.table).pay());
-            diner.getHall().getTables().clientGone(order.table);
-            givePaymentToBookkeeper();
-        } else {
-            diner.getBarmen().setReadyOrder(order);
-        }
+        Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+            if (order.orderPlace == Room.OrderPlace.DRIVETHRU) {
+                move(driveThru);
+                driveThru.getCar().setOrder(order);
+                Observable.timer(1, TimeUnit.SECONDS).subscribe(s -> {
+                    changeMoney(driveThru.carGone().pay());
+                });
+                Observable.timer(2, TimeUnit.SECONDS).subscribe(s -> {
+                    givePaymentToBookkeeper();
+                });
+            } else if (order.orderPlace == Room.OrderPlace.TABLES) {
+                move(diner.getHall().getTables());
+                diner.getHall().getTables().getClient(order.table).setOrder(order);
+                Observable.timer(1, TimeUnit.SECONDS).subscribe(s -> {
+                    changeMoney(diner.getHall().getTables().getClient(order.table).pay());
+                    diner.getHall().getTables().clientGone(order.table);
+                });
+                Observable.timer(2, TimeUnit.SECONDS).subscribe(s -> {
+                    givePaymentToBookkeeper();
+                });
+            } else {
+                diner.getBarmen().setReadyOrder(order);
+            }
 
-        useToilet();
-
+            useToilet();
+        });
     }
 
     private void transferOrderFromBar(Order order) {
-        move(kitchen);
-        Logger.debug("Заказ передан в кухню");
-        kitchen.acceptOrder(order);
+        Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+            move(kitchen);
+            Logger.debug("Заказ передан в кухню " + order);
+            kitchen.acceptOrder(order);
+        });
     }
 
     private void givePaymentToBookkeeper() {
-        move(diner.getBookkeeping());
-        diner.getBookkeeper().giveClientPayment(getMoney());
-        money = "$0";
+        Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+            move(diner.getBookkeeping());
+            diner.getBookkeeper().giveClientPayment(getMoney());
+            money = "$0";
+        });
     }
 
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
-            Logger.info(this.getClass().getSimpleName() + " воспользовался туалетом");
-            diner.getHall().getToilet().getDirty();
+            Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+                Logger.info(this.getClass().getSimpleName() + " воспользовался туалетом");
+                diner.getHall().getToilet().getDirty();
+            });
         }
     }
 
@@ -119,8 +142,7 @@ public class Waiter extends Staff implements Observer<String> {
             order = diner.getHall().getBar().getReadyOrder();
             if (order.orderPlace == Room.OrderPlace.BAR) {
                 transferOrderFromBar(order);
-            }
-            else if (order.isready()) {
+            } else if (order.isready()) {
                 carryOrder(order);
             }
         } else {

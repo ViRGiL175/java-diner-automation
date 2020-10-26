@@ -1,6 +1,7 @@
 package ru.commandos.Humans;
 
 import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import org.tinylog.Logger;
@@ -8,6 +9,7 @@ import ru.commandos.Diner;
 import ru.commandos.Rooms.Room;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 public class Cleaner extends Staff implements Observer<Room> {
 
@@ -18,8 +20,10 @@ public class Cleaner extends Staff implements Observer<Room> {
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
-            Logger.info(this.getClass().getSimpleName() + " воспользовался туалетом");
-            diner.getHall().getToilet().getDirty();
+            Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+                Logger.info(this.getClass().getSimpleName() + " воспользовался туалетом");
+                diner.getHall().getToilet().getDirty();
+            });
         }
     }
 
@@ -30,11 +34,12 @@ public class Cleaner extends Staff implements Observer<Room> {
 
     @Override
     public void onNext(@NonNull Room room) {
-        currentRoom = room;
-        diner.clean(currentRoom);
+        Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+            currentRoom = room;
+            diner.clean(currentRoom);
 
-        useToilet();
-
+            useToilet();
+        });
     }
 
     @Override

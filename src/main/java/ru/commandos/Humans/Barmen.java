@@ -1,6 +1,7 @@
 package ru.commandos.Humans;
 
 import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import org.tinylog.Logger;
@@ -11,6 +12,7 @@ import ru.commandos.Rooms.Bar;
 import ru.commandos.Rooms.Room;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 
 public class Barmen extends Staff implements Observer<String> {
@@ -24,53 +26,59 @@ public class Barmen extends Staff implements Observer<String> {
     }
 
     private void shake(Order order) {
-        for(Drink drink : order.drinks) {
+        for (Drink drink : order.drinks) {
             for (String ingredient : drink.getIngredients().keySet()) {
                 bar.getIngredients(ingredient, drink.getIngredients().get(ingredient));
             }
             order.doneDrinks.add(drink);
         }
         Logger.debug("ингредиентов осталось в баре: " + bar.checkIngredients());
-        Logger.debug("Бармен сделал напитки");
+        Logger.debug("Бармен сделал напитки " + order);
         currentRoom.getDirty();
 
         useToilet();
 
         if (order.orderPlace != Room.OrderPlace.BAR || !order.dishes.isEmpty()) {
             bar.transfer(order);
-        }
-        else {
+        } else {
             setReadyOrder(order);
         }
     }
 
     private void acceptOrder(Integer chairNumber) {
-        bar.getClient(chairNumber).setMenu(diner.getMenu());
-        Order order = bar.getClient(chairNumber).getOrder();
-        if (order.cost == 0.) {
-            Logger.info("Клиент ничего не заказал");
-            bar.clientGone(order.table);
-        } else {
-            Logger.info("Бармен взял заказ в баре: " + order);
-            transferOrder(order);
-        }
+        Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> bar.getClient(chairNumber).setMenu(diner.getMenu()));
+        Observable.timer(2, TimeUnit.SECONDS).subscribe(v -> {
+            Order order = bar.getClient(chairNumber).getOrder();
+            if (order.cost == 0.) {
+                Logger.info("Клиент ничего не заказал");
+                bar.clientGone(order.table);
+            } else {
+                Logger.info("Бармен взял заказ в баре: " + order);
+                transferOrder(order);
+            }
+        });
     }
 
     private void transferOrder(Order order) {
         if (!order.drinks.isEmpty()) {
-            shake(order);
-        }
-        else {
+            Observable.timer(5, TimeUnit.SECONDS).subscribe(v -> shake(order));
+        } else {
             bar.transfer(order);
         }
     }
 
     public void setReadyOrder(Order order) {
-        Logger.debug("Бармен отдаёт заказ клиенту");
-        bar.getClient(order.table).setOrder(order);
+        Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+            Logger.debug("Бармен отдаёт заказ клиенту " + order);
+            bar.getClient(order.table).setOrder(order);
+        });
+        Observable.timer(2, TimeUnit.SECONDS).subscribe(v -> {
         changeMoney(bar.getClient(order.table).pay());
         bar.clientGone(order.table);
+        });
+        Observable.timer(3, TimeUnit.SECONDS).subscribe(v -> {
         givePaymentToBookkeeper();
+        });
     }
 
     private void givePaymentToBookkeeper() {
@@ -81,8 +89,10 @@ public class Barmen extends Staff implements Observer<String> {
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
+            Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
             Logger.info(this.getClass().getSimpleName() + " воспользовался туалетом");
             diner.getHall().getToilet().getDirty();
+            });
         }
     }
 
@@ -94,9 +104,8 @@ public class Barmen extends Staff implements Observer<String> {
     @Override
     public void onNext(@NonNull String s) {
         if (s.equals(Waiter.class.getSimpleName())) {
-            shake(bar.getWaitOrder());
-        }
-        else {
+            Observable.timer(5, TimeUnit.SECONDS).subscribe(v -> shake(bar.getWaitOrder()));
+        } else {
             Integer table = Integer.parseInt(new StringBuffer(s).delete(0, 3).toString());
             acceptOrder(table);
         }

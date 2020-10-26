@@ -1,5 +1,6 @@
 package ru.commandos.Humans;
 
+import io.reactivex.rxjava3.core.Observable;
 import org.tinylog.Logger;
 import ru.commandos.Food.Dish.Dish;
 import ru.commandos.Food.Drink.Drink;
@@ -12,6 +13,7 @@ import ru.commandos.Rooms.Tables;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 public class Client extends Human {
 
@@ -89,13 +91,16 @@ public class Client extends Human {
 
     @Override
     public void useToilet() {
+
         if (new Random().nextInt(10) < 2) {
-            Logger.info(this.getClass().getSimpleName() + " воспользовался туалетом");
-            if (currentRoom instanceof Tables) {
-                ((Tables) currentRoom).getToilet().getDirty();
-            } else if (currentRoom instanceof Bar) {
-                ((Bar) currentRoom).getToilet().getDirty();
-            }
+            Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+                Logger.info(this.getClass().getSimpleName() + " воспользовался туалетом");
+                if (currentRoom instanceof Tables) {
+                    ((Tables) currentRoom).getToilet().getDirty();
+                } else if (currentRoom instanceof Bar) {
+                    ((Bar) currentRoom).getToilet().getDirty();
+                }
+            });
         }
     }
 

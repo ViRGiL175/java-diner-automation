@@ -1,6 +1,7 @@
 package ru.commandos.Humans;
 
 import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import org.tinylog.Logger;
@@ -9,6 +10,7 @@ import ru.commandos.Food.IngredientList;
 import ru.commandos.Rooms.Bookkeeping;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class Bookkeeper extends Staff implements Observer<Date> {
 
@@ -57,8 +59,10 @@ public class Bookkeeper extends Staff implements Observer<Date> {
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
-            Logger.info(this.getClass().getSimpleName() + " воспользовался туалетом");
-            diner.getHall().getToilet().getDirty();
+            Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+                Logger.info(this.getClass().getSimpleName() + " воспользовался туалетом");
+                diner.getHall().getToilet().getDirty();
+            });
         }
     }
 
@@ -75,27 +79,35 @@ public class Bookkeeper extends Staff implements Observer<Date> {
             GregorianCalendar calendarToday = new GregorianCalendar();
             calendarToday.setTime(date);
             if (calendarToday.get(Calendar.MONTH) > calendar.get(Calendar.MONTH)) {
-                calendar = calendarToday;
-                payTax();
-                payDay();
+                Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+                    calendar = calendarToday;
+                    payTax();
+                    payDay();
+                });
             }
         }
         HashMap<String, Integer> ingredients = diner.getKitchen().checkIngredients();
         for (String ingredient : ingredients.keySet()) {
             if (ingredients.get(ingredient) < 5) {
-                Integer countIngredientToBuy = 10 - ingredients.get(ingredient);
-                Double money = bookkeeping.getMoneyFromBudget(countIngredientToBuy * IngredientList.getIngredientCost(ingredient));
-                Logger.info("Бухгалтер купил ингредиент: " + ingredient + "X" + countIngredientToBuy);
-                diner.getKitchen().setIngredients(ingredient, countIngredientToBuy);
+                HashMap<String, Integer> finalIngredients = ingredients;
+                Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+                    Integer countIngredientToBuy = 10 - finalIngredients.get(ingredient);
+                    Double money = bookkeeping.getMoneyFromBudget(countIngredientToBuy * IngredientList.getIngredientCost(ingredient));
+                    Logger.info("Бухгалтер купил ингредиент: " + ingredient + "X" + countIngredientToBuy);
+                    diner.getKitchen().setIngredients(ingredient, countIngredientToBuy);
+                });
             }
         }
         ingredients = diner.getHall().getBar().checkIngredients();
         for (String ingredient : ingredients.keySet()) {
             if (ingredients.get(ingredient) < 5) {
-                Integer countIngredientToBuy = 10 - ingredients.get(ingredient);
-                Double money = bookkeeping.getMoneyFromBudget(countIngredientToBuy * IngredientList.getIngredientCost(ingredient));
-                Logger.info("Бухгалтер купил ингредиент: " + ingredient + "X" + countIngredientToBuy);
-                diner.getHall().getBar().setIngredients(ingredient, countIngredientToBuy);
+                HashMap<String, Integer> finalIngredients1 = ingredients;
+                Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+                    Integer countIngredientToBuy = 10 - finalIngredients1.get(ingredient);
+                    Double money = bookkeeping.getMoneyFromBudget(countIngredientToBuy * IngredientList.getIngredientCost(ingredient));
+                    Logger.info("Бухгалтер купил ингредиент: " + ingredient + "X" + countIngredientToBuy);
+                    diner.getHall().getBar().setIngredients(ingredient, countIngredientToBuy);
+                });
             }
         }
         currentRoom.getDirty();

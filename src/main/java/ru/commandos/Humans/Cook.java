@@ -1,6 +1,7 @@
 package ru.commandos.Humans;
 
 import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import org.tinylog.Logger;
@@ -10,6 +11,7 @@ import ru.commandos.Order;
 import ru.commandos.Rooms.Kitchen;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 
 public class Cook extends Staff implements Observer<Order> {
@@ -23,7 +25,6 @@ public class Cook extends Staff implements Observer<Order> {
     }
 
     private void cook(Order order) {
-        Logger.debug("Повар готовит");
         for (Dish dish : order.dishes) {
             for (String ingredient : dish.getIngredients().keySet()) {
                 kitchen.getIngredients(ingredient, dish.getIngredients().get(ingredient));
@@ -35,7 +36,7 @@ public class Cook extends Staff implements Observer<Order> {
         useToilet();
 
         Logger.info("ингредиентов осталось на кухне: " + kitchen.checkIngredients());
-        Logger.debug("Повар приготовил блюда");
+        Logger.debug("Повар приготовил блюда " + order);
         kitchen.transferDish(order);
     }
 
@@ -54,7 +55,8 @@ public class Cook extends Staff implements Observer<Order> {
 
     @Override
     public void onNext(@NonNull Order order) {
-        cook(order);
+        Logger.debug("Повар готовит " + order);
+        Observable.timer(5, TimeUnit.SECONDS).subscribe(v -> cook(order));
     }
 
     @Override
