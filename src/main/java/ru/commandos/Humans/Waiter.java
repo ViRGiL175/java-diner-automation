@@ -74,6 +74,11 @@ public class Waiter extends Staff implements Observer<String> {
             changeMoney(diner.getHall().getTables().getClient(order.table).pay());
             diner.getHall().getTables().clientGone(order.table);
             givePaymentToBookkeeper();
+            if (new Random().nextInt(10) > 3) {
+                diner.getHall().getTables().clientGone(order.table);
+            } else {
+                diner.getWaiter().acceptTablesOrder(order.table);
+            }
         } else {
             diner.getBarmen().setReadyOrder(order);
         }
@@ -119,8 +124,7 @@ public class Waiter extends Staff implements Observer<String> {
             order = diner.getHall().getBar().getReadyOrder();
             if (order.orderPlace == Room.OrderPlace.BAR) {
                 transferOrderFromBar(order);
-            }
-            else if (order.isready()) {
+            } else if (order.isready()) {
                 carryOrder(order);
             }
         } else {
