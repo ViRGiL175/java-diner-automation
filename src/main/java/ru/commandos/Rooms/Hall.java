@@ -46,13 +46,17 @@ public class Hall implements Observer<String> {
 
     @Override
     public void onNext(@NonNull String s) {
-        Gson gson = new Gson();
-        Client client = gson.fromJson(s, Client.class);
-        if (new Random().nextInt(10) > 3) {
-            tables.setClient(client);
-        }
-        else {
-            bar.setClient(client);
+
+        if (new Random().nextInt(10) > 2) {
+            Gson gson = new Gson();
+            Client client = gson.fromJson(s, Client.class);
+            if (new Random().nextInt(10) > 3) {
+                tables.setClient(client);
+            } else {
+                bar.setClient(client);
+            }
+        } else {
+            Logger.info("Клиент подумал и ушел!");
         }
     }
 
