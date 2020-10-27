@@ -15,14 +15,14 @@ public class Kitchen extends Room {
     private final HashMap<String, Integer> ingredients = new HashMap<>();
 
     {
-        ingredients.put("Сыр", 10);
-        ingredients.put("Тесто", 10);
-        ingredients.put("Баранина", 10);
-        ingredients.put("Перец", 10);
-        ingredients.put("Кабачок", 10);
-        ingredients.put("Лук", 10);
-        ingredients.put("Летучая мышь", 10);
-        ingredients.put("Масло", 10);
+        ingredients.put("Cheese", 10);
+        ingredients.put("Dough", 10);
+        ingredients.put("Mutton", 10);
+        ingredients.put("Pepper", 10);
+        ingredients.put("Zucchini", 10);
+        ingredients.put("Onion", 10);
+        ingredients.put("Bat", 10);
+        ingredients.put("Oil", 10);
     }
 
     private final ArrayDeque<Order> readyOrder = new ArrayDeque<>();

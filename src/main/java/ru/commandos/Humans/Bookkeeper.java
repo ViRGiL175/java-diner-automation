@@ -19,7 +19,7 @@ public class Bookkeeper extends Staff implements Observer<Date> {
         super(diner);
         this.bookkeeping = bookkeeping;
         currentRoom = bookkeeping;
-        Logger.info("Мы наняли лучшего бухгалтера, чтобы дела шли в гору!");
+        Logger.info("Bookkeeper is ready to work");
     }
 
     private void payTax() {
@@ -30,22 +30,22 @@ public class Bookkeeper extends Staff implements Observer<Date> {
         Double tax = BD * FP * K1 * K2 * 15.0 / 100.0;
         if (tax <= bookkeeping.checkBudget()) {
             bookkeeping.getMoneyFromBudget(tax);
-            Logger.info("Налоги оплачены");
+            Logger.info("Taxes paid");
         } else {
-            Logger.warn("Налоги не оплачены из-за нехватки денег");
+            Logger.warn("Taxes not paid due to lack of money");
         }
     }
 
     private void payDay() {
-        Logger.info("День зарплаты!");
+        Logger.info("Payday!");
         HashMap<Staff, Double> pay = bookkeeping.getStaffPayList();
         for (Staff staff : pay.keySet()) {
             if (pay.get(staff) <= bookkeeping.checkBudget()) {
                 Double money = bookkeeping.getMoneyFromBudget(pay.get(staff));
                 staff.changeMoney(money);
-                Logger.debug(staff.getClass().getSimpleName() + " получил зарплату");
+                Logger.debug(staff.getClass().getSimpleName() + " receive a salary");
             } else {
-                Logger.warn(staff.getClass().getSimpleName() + " не получил зарплату");
+                Logger.warn(staff.getClass().getSimpleName() + " didn't receive a salary");
             }
         }
     }
@@ -57,7 +57,7 @@ public class Bookkeeper extends Staff implements Observer<Date> {
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
-            Logger.info(this.getClass().getSimpleName() + " воспользовался туалетом");
+            Logger.info(this.getClass().getSimpleName() + " used Toilet");
             diner.getHall().getToilet().getDirty();
         }
     }
@@ -85,7 +85,7 @@ public class Bookkeeper extends Staff implements Observer<Date> {
             if (ingredients.get(ingredient) < 5) {
                 Integer countIngredientToBuy = 10 - ingredients.get(ingredient);
                 Double money = bookkeeping.getMoneyFromBudget(countIngredientToBuy * IngredientList.getIngredientCost(ingredient));
-                Logger.info("Бухгалтер купил ингредиент: " + ingredient + "X" + countIngredientToBuy);
+                Logger.info("Bookkeeper bought an ingredient: " + ingredient + "X" + countIngredientToBuy);
                 diner.getKitchen().setIngredients(ingredient, countIngredientToBuy);
             }
         }
@@ -94,7 +94,7 @@ public class Bookkeeper extends Staff implements Observer<Date> {
             if (ingredients.get(ingredient) < 5) {
                 Integer countIngredientToBuy = 10 - ingredients.get(ingredient);
                 Double money = bookkeeping.getMoneyFromBudget(countIngredientToBuy * IngredientList.getIngredientCost(ingredient));
-                Logger.info("Бухгалтер купил ингредиент: " + ingredient + "X" + countIngredientToBuy);
+                Logger.info("Bookkeeper bought an ingredient: " + ingredient + "X" + countIngredientToBuy);
                 diner.getHall().getBar().setIngredients(ingredient, countIngredientToBuy);
             }
         }
@@ -111,6 +111,6 @@ public class Bookkeeper extends Staff implements Observer<Date> {
 
     @Override
     public void onComplete() {
-        Logger.warn("Бухгалтер подавился монетами");
+        Logger.warn("Bookkeeper is sleeping");
     }
 }
