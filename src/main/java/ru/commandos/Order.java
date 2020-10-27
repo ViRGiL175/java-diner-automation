@@ -38,7 +38,7 @@ public class Order {
                 ((orderPlace == Room.OrderPlace.DRIVETHRU)
                         ? (", orderPlace=" + orderPlace.name())
                         : (", orderPlace=" + orderPlace.name() + ", table=" + table)) +
-                ", cost=" + cost +
+                ", cost=" + String.format("$%.2f", cost) +
                 '}';
     }
 

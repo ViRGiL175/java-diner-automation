@@ -18,14 +18,14 @@ public class Cleaner extends Staff implements Observer<Room> {
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
-            Logger.info(this.getClass().getSimpleName() + " воспользовался туалетом");
+            Logger.info(this.getClass().getSimpleName() + " used Toilet");
             diner.getHall().getToilet().getDirty();
         }
     }
 
     @Override
     public void onSubscribe(@NonNull Disposable d) {
-        Logger.info("Уборщик готов драить до блеска");
+        Logger.info("Cleaner is ready to work");
     }
 
     @Override
@@ -44,6 +44,6 @@ public class Cleaner extends Staff implements Observer<Room> {
 
     @Override
     public void onComplete() {
-        Logger.warn("Уборщик наелся и спит");
+        Logger.warn("Cleaner is sleeping");
     }
 }

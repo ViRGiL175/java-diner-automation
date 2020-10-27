@@ -23,7 +23,7 @@ public class Cook extends Staff implements Observer<Order> {
     }
 
     private void cook(Order order) {
-        Logger.debug("Повар готовит");
+        Logger.debug("Cook is cooking");
         for (Dish dish : order.dishes) {
             for (String ingredient : dish.getIngredients().keySet()) {
                 kitchen.getIngredients(ingredient, dish.getIngredients().get(ingredient));
@@ -34,22 +34,22 @@ public class Cook extends Staff implements Observer<Order> {
 
         useToilet();
 
-        Logger.info("ингредиентов осталось на кухне: " + kitchen.checkIngredients());
-        Logger.debug("Повар приготовил блюда");
+        Logger.info("List of remaining ingredients in the Kitchen: " + kitchen.checkIngredients());
+        Logger.debug("Cook cooked dishes");
         kitchen.transferDish(order);
     }
 
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
-            Logger.info(this.getClass().getSimpleName() + " воспользовался туалетом");
+            Logger.info(this.getClass().getSimpleName() + " used Toilet");
             diner.getHall().getToilet().getDirty();
         }
     }
 
     @Override
     public void onSubscribe(@NonNull Disposable d) {
-        Logger.info("Повар готов творить чудеса кулинарии");
+        Logger.info("Cook is ready to work");
     }
 
     @Override
@@ -64,6 +64,6 @@ public class Cook extends Staff implements Observer<Order> {
 
     @Override
     public void onComplete() {
-        Logger.warn("Повар больше не может готовить");
+        Logger.warn("Cook is sleeping");
     }
 }

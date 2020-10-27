@@ -53,7 +53,7 @@ public class Diner {
 
     public Diner(Observable<String> jsonObservable, Observable<Date> dateObservable) {
         bookkeeping.createPayMap();
-        Logger.info("Дайнер начал работу");
+        Logger.info("Diner is starting work");
         kitchen.subscribe(cook);
         kitchen.subscribe(waiter);
         cleanerCaller.subscribe(cleaner);
@@ -67,14 +67,14 @@ public class Diner {
         int dirt = roomDirt.get(room) + new Random().nextInt(maxRoomDirtSpeed.get(room) + 1);
         roomDirt.replace(room, dirt);
         if (roomDirt.get(room) >= maxRoomDirt.get(room)) {
-            Logger.warn("Критический уровень загрязнения в " + room.getClass().getSimpleName() + ": " + dirt);
+            Logger.warn("Critical pollution in " + room.getClass().getSimpleName() + ": " + dirt);
             cleanerCaller.onNext(room);
         }
     }
 
     public void clean(Room room) {
         roomDirt.replace(room, 0);
-        Logger.info("Уборщик прибрался в " + room.getClass().getSimpleName());
+        Logger.info("Cleaner tidied up in " + room.getClass().getSimpleName());
     }
 
     public Menu getMenu() {

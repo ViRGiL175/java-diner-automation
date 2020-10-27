@@ -32,7 +32,7 @@ public class DriveThru extends Room implements Observer<String> {
 
     public void subscribe(Waiter waiter) {
         caller.subscribe(waiter);
-        Logger.info("Официант готов принимать заказы на Драйв-тру");
+        Logger.info("Waiter is ready to take orders from Drive-Thru");
     }
 
     @Override
@@ -42,7 +42,7 @@ public class DriveThru extends Room implements Observer<String> {
 
     @Override
     public void onSubscribe(@NonNull Disposable d) {
-        System.out.println("Драйв-тру открыт");
+        System.out.println("Drive-Thru is open");
     }
 
     @Override
@@ -62,6 +62,6 @@ public class DriveThru extends Room implements Observer<String> {
 
     @Override
     public void onComplete() {
-        Logger.warn("Драйв-тру закрыт");
+        Logger.warn("Drive-Thru is close");
     }
 }

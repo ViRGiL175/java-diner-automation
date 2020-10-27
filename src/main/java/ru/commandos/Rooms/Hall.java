@@ -38,7 +38,7 @@ public class Hall implements Observer<String> {
 
     @Override
     public void onSubscribe(@NonNull Disposable d) {
-        Logger.info("Зал открыт");
+        Logger.info("Hall is open");
         bar.subscribe(diner.getBarmen());
         bar.subscribe(diner.getWaiter());
         tables.subscribe(diner.getWaiter());
@@ -63,6 +63,6 @@ public class Hall implements Observer<String> {
 
     @Override
     public void onComplete() {
-        Logger.warn("Зал закрыт");
+        Logger.warn("Hall is close");
     }
 }

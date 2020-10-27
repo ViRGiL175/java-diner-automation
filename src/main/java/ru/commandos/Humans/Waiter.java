@@ -27,10 +27,10 @@ public class Waiter extends Staff implements Observer<String> {
         diner.getHall().getTables().getClient(tableNumber).setMenu(diner.getMenu());
         order = diner.getHall().getTables().getClient(tableNumber).getOrder();
         if (order.cost == 0.) {
-            Logger.info("Клиент ничего не заказал");
+            Logger.info("Client hasn't ordered");
             diner.getHall().getTables().clientGone(order.table);
         } else {
-            Logger.info("Официант взял заказ в Зале: " + order);
+            Logger.info("Waiter took Order at Tables: " + order);
             transferOrder(order);
         }
     }
@@ -40,10 +40,10 @@ public class Waiter extends Staff implements Observer<String> {
         driveThru.getCar().setMenu(diner.getMenu());
         order = driveThru.getCar().getOrder();
         if (order.cost == 0.) {
-            Logger.info("Клиент ничего не заказал");
+            Logger.info("Client hasn't ordered");
             driveThru.carGone();
         } else {
-            Logger.info("Официант взял заказ на Драйв-тру: " + order);
+            Logger.info("Waiter took Order at Drive-Thru: " + order);
             transferOrder(order);
         }
     }
@@ -51,18 +51,18 @@ public class Waiter extends Staff implements Observer<String> {
     private void transferOrder(Order order) {
         if (!order.dishes.isEmpty()) {
             move(kitchen);
-            Logger.debug("Заказ передан в кухню");
+            Logger.debug("Order has been transferred to Kitchen");
             kitchen.acceptOrder(order);
         }
         if (!order.drinks.isEmpty()) {
             move(diner.getHall().getBar());
-            Logger.debug("Заказ передан в бар");
+            Logger.debug("Order has been transferred to Bar");
             diner.getHall().getBar().acceptOrder(order);
         }
     }
 
     private void carryOrder(Order order) {
-        Logger.debug("Официант взял готовый заказ");
+        Logger.debug("Waiter took the ready Order");
         if (order.orderPlace == Room.OrderPlace.DRIVETHRU) {
             move(driveThru);
             driveThru.getCar().setOrder(order);
@@ -84,7 +84,7 @@ public class Waiter extends Staff implements Observer<String> {
 
     private void transferOrderFromBar(Order order) {
         move(kitchen);
-        Logger.debug("Заказ передан в кухню");
+        Logger.debug("Order has been transferred to Kitchen");
         kitchen.acceptOrder(order);
     }
 
@@ -97,7 +97,7 @@ public class Waiter extends Staff implements Observer<String> {
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
-            Logger.info(this.getClass().getSimpleName() + " воспользовался туалетом");
+            Logger.info(this.getClass().getSimpleName() + " used Toilet");
             diner.getHall().getToilet().getDirty();
         }
     }
@@ -136,6 +136,6 @@ public class Waiter extends Staff implements Observer<String> {
 
     @Override
     public void onComplete() {
-        Logger.warn("Официант больше не может принимать заказы");
+        Logger.warn("Waiter is sleeping");
     }
 }

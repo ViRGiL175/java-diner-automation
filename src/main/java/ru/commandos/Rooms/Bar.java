@@ -16,10 +16,10 @@ public class Bar extends Room {
     private final HashMap<String, Integer> ingredients = new HashMap<>();
 
     {
-        ingredients.put("Спирт этиловый", 10);
-        ingredients.put("Лимонный сок", 10);
-        ingredients.put("Какао бобы", 10);
-        ingredients.put("Молоко", 10);
+        ingredients.put("Ethanol", 10);
+        ingredients.put("Lemon juice", 10);
+        ingredients.put("Cocoa beans", 10);
+        ingredients.put("Milk", 10);
     }
 
     private final ArrayList<Client> chairs = new ArrayList<>();
@@ -61,17 +61,17 @@ public class Bar extends Room {
             client.setTable(chair);
             chairs.set(chair, client);
             freePlace.remove(chair);
-            Logger.info("Клиент " + client + " готов сделать заказ в баре!");
+            Logger.info(client + " ready to do order!");
             barmenCaller.onNext(Bar.class.getSimpleName() + chair);
         } else {
-            Logger.info("Мест нет!");
+            Logger.info("No place!");
         }
     }
 
     public void clientGone(Integer chair) {
         chairs.set(chair, null);
         freePlace.add(chair);
-        Logger.info("Клиент ушёл, стул №" + chair + " освободился");
+        Logger.info("Client is gone, chair #" + chair + " is free");
     }
 
     public void getIngredients(String ingredient, Integer count) {

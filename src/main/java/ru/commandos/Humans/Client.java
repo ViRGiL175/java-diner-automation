@@ -27,12 +27,12 @@ public class Client extends Human {
 
     public void setTable(Integer table) {
         this.table = table;
-        Logger.info("Клиент " + this + " сел за стол №" + table);
+        Logger.info(this + " sat at the table№" + table);
     }
 
     public void setMenu(Menu menu) {
         this.menu = menu;
-        Logger.info("Клиент " + this + " получил меню");
+        Logger.info(this + " got a menu");
     }
 
     public Order getOrder() {
@@ -71,9 +71,9 @@ public class Client extends Human {
 
     public void setOrder(Order order) {
         if (!this.order.equals(order)) {
-            Logger.warn("Официант ошибся с заказом :(");
+            Logger.warn("Waiter made a mistake with the order :(");
         } else {
-            Logger.info("Клиент получил заказ");
+            Logger.info("Client got order");
         }
         currentRoom.getDirty();
 
@@ -83,14 +83,14 @@ public class Client extends Human {
 
     public Double pay() {
         changeMoney(-order.cost);
-        Logger.info("Клиент оплатил заказ");
+        Logger.info("Client paid for order");
         return order.cost;
     }
 
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
-            Logger.info(this.getClass().getSimpleName() + " воспользовался туалетом");
+            Logger.info(this.getClass().getSimpleName() + " used Toilet");
             if (currentRoom instanceof Tables) {
                 ((Tables) currentRoom).getToilet().getDirty();
             } else if (currentRoom instanceof Bar) {

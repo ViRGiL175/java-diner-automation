@@ -31,7 +31,7 @@ public class Tables extends Room {
 
     public void subscribe(Waiter waiter) {
         caller.subscribe(waiter);
-        Logger.info("Официант готов принимать заказы в зале");
+        Logger.info("Waiter is ready to work");
     }
 
     public Client getClient(Integer tableNumber) {
@@ -47,17 +47,17 @@ public class Tables extends Room {
             client.setTable(table);
             tables.set(table, client);
             freePlace.remove(table);
-            Logger.info("Клиент " + client + " готов сделать заказ в зале!");
+            Logger.info(client + " ready to do order!");
             caller.onNext(Tables.class.getSimpleName() + table);
         } else {
-            Logger.warn("Мест нет!");
+            Logger.warn("No place!");
         }
     }
 
     public void clientGone(Integer table) {
         tables.set(table, null);
         freePlace.add(table);
-        Logger.info("Клиент ушёл, столик №" + table + " освободился");
+        Logger.info("Client is gone, table #" + table + " is free");
     }
 
     public Toilet getToilet() {

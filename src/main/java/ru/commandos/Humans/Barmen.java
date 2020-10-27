@@ -30,8 +30,8 @@ public class Barmen extends Staff implements Observer<String> {
             }
             order.doneDrinks.add(drink);
         }
-        Logger.debug("ингредиентов осталось в баре: " + bar.checkIngredients());
-        Logger.debug("Бармен сделал напитки");
+        Logger.debug("List of remaining ingredients in the Bar: " + bar.checkIngredients());
+        Logger.debug("Barmen made drinks");
         currentRoom.getDirty();
 
         useToilet();
@@ -48,10 +48,10 @@ public class Barmen extends Staff implements Observer<String> {
         bar.getClient(chairNumber).setMenu(diner.getMenu());
         Order order = bar.getClient(chairNumber).getOrder();
         if (order.cost == 0.) {
-            Logger.info("Клиент ничего не заказал");
+            Logger.info("Client hasn't ordered");
             bar.clientGone(order.table);
         } else {
-            Logger.info("Бармен взял заказ в баре: " + order);
+            Logger.info("Barmen took Order at Bar: " + order);
             transferOrder(order);
         }
     }
@@ -66,7 +66,7 @@ public class Barmen extends Staff implements Observer<String> {
     }
 
     public void setReadyOrder(Order order) {
-        Logger.debug("Бармен отдаёт заказ клиенту");
+        Logger.debug("Barmen gives the order to Client");
         bar.getClient(order.table).setOrder(order);
         changeMoney(bar.getClient(order.table).pay());
         bar.clientGone(order.table);
@@ -81,14 +81,14 @@ public class Barmen extends Staff implements Observer<String> {
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
-            Logger.info(this.getClass().getSimpleName() + " воспользовался туалетом");
+            Logger.info(this.getClass().getSimpleName() + " used Toilet");
             diner.getHall().getToilet().getDirty();
         }
     }
 
     @Override
     public void onSubscribe(@NonNull Disposable d) {
-        Logger.info("Бармен готов спаивать посетителей");
+        Logger.info("Barmen is ready to work");
     }
 
     @Override
@@ -109,6 +109,6 @@ public class Barmen extends Staff implements Observer<String> {
 
     @Override
     public void onComplete() {
-        Logger.warn("Бармен больше не наливает");
+        Logger.warn("Barmen is sleeping");
     }
 }
