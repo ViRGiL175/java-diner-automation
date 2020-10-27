@@ -99,7 +99,7 @@ public class Client extends Human {
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
-            Observable.timer(Diner.timeConst, TimeUnit.SECONDS).subscribe(v -> {
+            Observable.timer(Diner.timeConst/12, TimeUnit.SECONDS).subscribe(v -> {
                 Logger.info(this.getClass().getSimpleName() + " used Toilet");
                 if (currentRoom instanceof Tables) {
                     ((Tables) currentRoom).getToilet().getDirty();
