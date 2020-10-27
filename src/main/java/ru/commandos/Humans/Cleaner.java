@@ -26,7 +26,7 @@ public class Cleaner extends Staff implements Observer<Room> {
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
-            Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+            Observable.timer(Diner.timeConst, TimeUnit.SECONDS).subscribe(v -> {
                 Logger.info(this.getClass().getSimpleName() + " used Toilet");
                 diner.getHall().getToilet().getDirty();
                 isFree = true;
@@ -53,7 +53,7 @@ public class Cleaner extends Staff implements Observer<Room> {
             if (isFree && action.peekFirst() == actionNumber) {
                 action.pollFirst();
                 isFree = false;
-                Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+                Observable.timer(Diner.timeConst, TimeUnit.SECONDS).subscribe(v -> {
                     currentRoom = room;
                     diner.clean(currentRoom);
 

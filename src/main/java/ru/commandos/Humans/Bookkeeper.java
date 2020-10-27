@@ -59,7 +59,7 @@ public class Bookkeeper extends Staff implements Observer<Date> {
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
-            Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+            Observable.timer(Diner.timeConst, TimeUnit.SECONDS).subscribe(v -> {
                 Logger.info(this.getClass().getSimpleName() + " used Toilet");
                 diner.getHall().getToilet().getDirty();
             });
@@ -79,7 +79,7 @@ public class Bookkeeper extends Staff implements Observer<Date> {
             GregorianCalendar calendarToday = new GregorianCalendar();
             calendarToday.setTime(date);
             if (calendarToday.get(Calendar.MONTH) > calendar.get(Calendar.MONTH)) {
-                Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+                Observable.timer(Diner.timeConst, TimeUnit.SECONDS).subscribe(v -> {
                     calendar = calendarToday;
                     payTax();
                     payDay();
@@ -90,7 +90,7 @@ public class Bookkeeper extends Staff implements Observer<Date> {
         for (String ingredient : ingredients.keySet()) {
             if (ingredients.get(ingredient) < 5) {
                 HashMap<String, Integer> finalIngredients = ingredients;
-                Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+                Observable.timer(Diner.timeConst, TimeUnit.SECONDS).subscribe(v -> {
                     Integer countIngredientToBuy = 10 - finalIngredients.get(ingredient);
                     Double money = bookkeeping.getMoneyFromBudget(countIngredientToBuy * IngredientList.getIngredientCost(ingredient));
                     Logger.info("Bookkeeper bought an ingredient: " + ingredient + "X" + countIngredientToBuy);
@@ -102,7 +102,7 @@ public class Bookkeeper extends Staff implements Observer<Date> {
         for (String ingredient : ingredients.keySet()) {
             if (ingredients.get(ingredient) < 5) {
                 HashMap<String, Integer> finalIngredients1 = ingredients;
-                Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+                Observable.timer(Diner.timeConst, TimeUnit.SECONDS).subscribe(v -> {
                     Integer countIngredientToBuy = 10 - finalIngredients1.get(ingredient);
                     Double money = bookkeeping.getMoneyFromBudget(countIngredientToBuy * IngredientList.getIngredientCost(ingredient));
                     Logger.info("Bookkeeper bought an ingredient: " + ingredient + "X" + countIngredientToBuy);

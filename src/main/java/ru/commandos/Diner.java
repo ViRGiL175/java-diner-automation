@@ -14,6 +14,8 @@ public class Diner {
 
     protected final PublishSubject<Room> cleanerCaller = PublishSubject.create();
 
+    public static final int timeConst = 20;
+
     private final Menu menu = new Menu();
     private final Hall hall = new Hall(this);
     private final DriveThru driveThru = new DriveThru(this);

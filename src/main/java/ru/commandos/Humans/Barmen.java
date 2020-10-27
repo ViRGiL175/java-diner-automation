@@ -52,10 +52,10 @@ public class Barmen extends Staff implements Observer<String> {
     }
 
     private void acceptOrder(Integer chairNumber) {
-        Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+        Observable.timer(Diner.timeConst, TimeUnit.SECONDS).subscribe(v -> {
             bar.getClient(chairNumber).setMenu(diner.getMenu());
         });
-        Observable.timer(2, TimeUnit.SECONDS).subscribe(v -> {
+        Observable.timer(2*Diner.timeConst, TimeUnit.SECONDS).subscribe(v -> {
             Order order = bar.getClient(chairNumber).getOrder();
             if (order.cost == 0.) {
                 Logger.info("Client hasn't ordered");
@@ -75,7 +75,7 @@ public class Barmen extends Staff implements Observer<String> {
                 bar.transfer(order);
             }
             Logger.debug("Barmen is shaking drinks");
-            Observable.timer(5, TimeUnit.SECONDS).subscribe(v -> shake(order));
+            Observable.timer(5*Diner.timeConst, TimeUnit.SECONDS).subscribe(v -> shake(order));
         } else {
             bar.transfer(order);
             isFree = true;
@@ -83,15 +83,15 @@ public class Barmen extends Staff implements Observer<String> {
     }
 
     public void setReadyOrder(Order order) {
-        Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+        Observable.timer(Diner.timeConst, TimeUnit.SECONDS).subscribe(v -> {
             Logger.debug("Barmen gives the order to Client " + order);
             bar.getClient(order.table).setOrder(order);
         });
-        Observable.timer(2, TimeUnit.SECONDS).subscribe(v -> {
+        Observable.timer(2*Diner.timeConst, TimeUnit.SECONDS).subscribe(v -> {
             changeMoney(bar.getClient(order.table).pay());
             bar.clientGone(order.table);
         });
-        Observable.timer(3, TimeUnit.SECONDS).subscribe(v -> {
+        Observable.timer(3*Diner.timeConst, TimeUnit.SECONDS).subscribe(v -> {
             givePaymentToBookkeeper();
 
             useToilet();
@@ -107,7 +107,7 @@ public class Barmen extends Staff implements Observer<String> {
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
-            Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+            Observable.timer(Diner.timeConst, TimeUnit.SECONDS).subscribe(v -> {
                 Logger.info(this.getClass().getSimpleName() + " used Toilet");
                 diner.getHall().getToilet().getDirty();
             });
@@ -143,7 +143,7 @@ public class Barmen extends Staff implements Observer<String> {
                         setReadyOrder(order);
                     } else {
                         Logger.debug("Barmen is shaking drinks");
-                        Observable.timer(5, TimeUnit.SECONDS).subscribe(v -> shake(order));
+                        Observable.timer(5*Diner.timeConst, TimeUnit.SECONDS).subscribe(v -> shake(order));
                     }
                 } else {
                     Integer table = Integer.parseInt(new StringBuffer(s).delete(0, 3).toString());
