@@ -157,7 +157,7 @@ public class Waiter extends Staff implements Observer<String> {
                     acceptDriveThruOrder();
                 } else if (s.equals(Kitchen.class.getSimpleName())) {
                     order = kitchen.getReadyOrder();
-                    if (order.isready()) {
+                    if (order.isready() && !order.placed) {
                         carryOrder(order);
                     }
                     else {
@@ -167,7 +167,7 @@ public class Waiter extends Staff implements Observer<String> {
                     order = diner.getHall().getBar().getReadyOrder();
                     if (order.orderPlace == Room.OrderPlace.BAR) {
                         transferOrderFromBar(order);
-                    } else if (order.isready()) {
+                    } else if (order.isready() && !order.placed) {
                         carryOrder(order);
                     }
                     else {

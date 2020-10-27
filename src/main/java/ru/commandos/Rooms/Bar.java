@@ -102,6 +102,14 @@ public class Bar extends Room {
         return readyOrder.pollFirst();
     }
 
+    public Order checkWaitOrder() {
+        return waitOrder.peekFirst();
+    }
+
+    public Order checkReadyOrder() {
+        return readyOrder.peekFirst();
+    }
+
     public void subscribe(Waiter waiter) {
         waiterCaller.subscribe(waiter);
     }

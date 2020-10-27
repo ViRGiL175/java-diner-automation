@@ -42,11 +42,13 @@ public class Barmen extends Staff implements Observer<String> {
         Logger.debug("Бармен сделал напитки " + order);
         currentRoom.getDirty();
 
-        if (order.orderPlace != Room.OrderPlace.BAR || !order.dishes.isEmpty()) {
+        if (order.orderPlace != Room.OrderPlace.BAR) {
             bar.transfer(order);
             isFree = true;
-        } else {
+        } else if (order.drinks.isEmpty()){
             setReadyOrder(order);
+        } else {
+            isFree = true;
         }
     }
 
@@ -69,6 +71,9 @@ public class Barmen extends Staff implements Observer<String> {
 
     private void transferOrder(Order order) {
         if (!order.drinks.isEmpty()) {
+            if (!order.dishes.isEmpty()) {
+                bar.transfer(order);
+            }
             Logger.debug("Бармен начал готовить напитки");
             Observable.timer(5, TimeUnit.SECONDS).subscribe(v -> shake(order));
         } else {
@@ -120,7 +125,12 @@ public class Barmen extends Staff implements Observer<String> {
             actionCount = 1;
         }
         long actionNumber = actionCount++;
-        action.addLast(actionNumber);
+
+        if (s.equals(Waiter.class.getSimpleName()) && bar.checkWaitOrder().orderPlace.equals(Room.OrderPlace.BAR))
+            action.addFirst(actionNumber);
+        else {
+            action.addLast(actionNumber);
+        }
         Observable.interval(1, TimeUnit.SECONDS).takeWhile(l1 -> !action.isEmpty() && action.peekFirst() <= actionNumber).subscribe(l2 -> {
             if (isFree && action.peekFirst() == actionNumber) {
                 action.pollFirst();

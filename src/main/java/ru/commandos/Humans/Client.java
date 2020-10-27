@@ -76,6 +76,7 @@ public class Client extends Human {
             Logger.warn("Официант ошибся с заказом :(");
         } else {
             Logger.info("Клиент получил заказ");
+            order.placed = true;
         }
         currentRoom.getDirty();
 

@@ -59,6 +59,10 @@ public class Kitchen extends Room {
         ingredients.replace(ingredient, ingredients.get(ingredient) - count);
     }
 
+    public Order checkReadyOrder() {
+        return readyOrder.pollFirst();
+    }
+
     public void setIngredients(String ingredient, Integer count) {
         ingredients.replace(ingredient, ingredients.get(ingredient) + count);
     }
