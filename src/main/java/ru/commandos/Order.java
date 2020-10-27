@@ -14,7 +14,8 @@ public class Order {
     public HashSet<Drink> doneDrinks = new HashSet<>();
     public Room.OrderPlace orderPlace;
     public Integer table;
-    public Double cost = 0.;
+    public double cost = 0;
+    public boolean placed = false;
 
     public Order(HashSet<Dish> dishes, HashSet<Drink> drinks, Menu menu, Room.OrderPlace orderPlace, Integer table, Double cost) {
         this.dishes = dishes;

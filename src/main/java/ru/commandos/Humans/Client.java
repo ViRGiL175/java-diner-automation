@@ -1,5 +1,6 @@
 package ru.commandos.Humans;
 
+import io.reactivex.rxjava3.core.Observable;
 import org.tinylog.Logger;
 import ru.commandos.Food.Dish.Dish;
 import ru.commandos.Food.Drink.Drink;
@@ -12,6 +13,7 @@ import ru.commandos.Rooms.Tables;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 public class Client extends Human {
 
@@ -27,7 +29,12 @@ public class Client extends Human {
 
     public void setTable(Integer table) {
         this.table = table;
-        Logger.info(this + " sat at the table№" + table);
+        if (orderPlace == Room.OrderPlace.TABLES) {
+            Logger.info(this + " sat at the table #" + table);
+        }
+        else {
+            Logger.info(this + " sat at the chair #" + table);
+        }
     }
 
     public void setMenu(Menu menu) {
@@ -74,6 +81,7 @@ public class Client extends Human {
             Logger.warn("Waiter made a mistake with the order :(");
         } else {
             Logger.info("Client got order");
+            order.placed = true;
         }
         currentRoom.getDirty();
 
@@ -90,12 +98,14 @@ public class Client extends Human {
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
-            Logger.info(this.getClass().getSimpleName() + " used Toilet");
-            if (currentRoom instanceof Tables) {
-                ((Tables) currentRoom).getToilet().getDirty();
-            } else if (currentRoom instanceof Bar) {
-                ((Bar) currentRoom).getToilet().getDirty();
-            }
+            Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+                Logger.info(this.getClass().getSimpleName() + " used Toilet");
+                if (currentRoom instanceof Tables) {
+                    ((Tables) currentRoom).getToilet().getDirty();
+                } else if (currentRoom instanceof Bar) {
+                    ((Bar) currentRoom).getToilet().getDirty();
+                }
+            });
         }
     }
 

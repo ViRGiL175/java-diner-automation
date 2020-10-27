@@ -1,5 +1,6 @@
 package ru.commandos.Rooms;
 
+import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import org.tinylog.Logger;
 import ru.commandos.Diner;
@@ -9,6 +10,8 @@ import ru.commandos.Humans.Waiter;
 import ru.commandos.Order;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+
 
 public class Bar extends Room {
 
@@ -43,12 +46,12 @@ public class Bar extends Room {
     }
 
     public void acceptOrder(Order order) {
-        waitOrder.add(order);
+        waitOrder.addLast(order);
         barmenCaller.onNext(Waiter.class.getSimpleName());
     }
 
     public void transfer(Order order) {
-        readyOrder.add(order);
+        readyOrder.addLast(order);
         waiterCaller.onNext(Bar.class.getSimpleName());
     }
 
@@ -61,8 +64,10 @@ public class Bar extends Room {
             client.setTable(chair);
             chairs.set(chair, client);
             freePlace.remove(chair);
-            Logger.info(client + " ready to do order!");
-            barmenCaller.onNext(Bar.class.getSimpleName() + chair);
+            Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+                Logger.info(client + " ready to do order!");
+                barmenCaller.onNext(Bar.class.getSimpleName() + chair);
+            });
         } else {
             Logger.info("No place!");
         }
@@ -97,6 +102,15 @@ public class Bar extends Room {
     public Order getReadyOrder() {
         return readyOrder.pollFirst();
     }
+
+    public Order checkWaitOrder() {
+        return waitOrder.peekFirst();
+    }
+
+    public Order checkReadyOrder() {
+        return readyOrder.peekFirst();
+    }
+
 
     public void subscribe(Waiter waiter) {
         waiterCaller.subscribe(waiter);
