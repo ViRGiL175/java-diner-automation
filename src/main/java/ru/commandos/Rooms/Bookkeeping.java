@@ -9,7 +9,7 @@ import java.util.HashMap;
 public class Bookkeeping extends Room {
 
     private final Diner diner;
-    private Double budget = 0.;
+    private Double budget = 1000.;
 
     private final HashMap<Staff, Double> pay = new HashMap<>();
 

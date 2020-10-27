@@ -48,7 +48,7 @@ public class Hall implements Observer<String> {
     public void onNext(@NonNull String s) {
         Gson gson = new Gson();
         Client client = gson.fromJson(s, Client.class);
-        if (new Random().nextInt(10) > 3) {
+        if (new Random().nextInt(10) > -1) {
             tables.setClient(client);
         }
         else {

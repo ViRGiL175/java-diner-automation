@@ -8,10 +8,16 @@ import org.tinylog.Logger;
 import ru.commandos.Diner;
 import ru.commandos.Rooms.Room;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class Cleaner extends Staff implements Observer<Room> {
+
+    private boolean isFree = true;
+    private long actionCount;
+    private final Deque<Long> action = new ArrayDeque<>();
 
     public Cleaner(Diner diner) {
         super(diner);
@@ -23,7 +29,11 @@ public class Cleaner extends Staff implements Observer<Room> {
             Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
                 Logger.info(this.getClass().getSimpleName() + " воспользовался туалетом");
                 diner.getHall().getToilet().getDirty();
+                isFree = true;
             });
+        }
+        else {
+            isFree = true;
         }
     }
 
@@ -34,11 +44,22 @@ public class Cleaner extends Staff implements Observer<Room> {
 
     @Override
     public void onNext(@NonNull Room room) {
-        Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
-            currentRoom = room;
-            diner.clean(currentRoom);
+        if (action.isEmpty() && actionCount > 30) {
+            actionCount = 1;
+        }
+        long actionNumber = actionCount++;
+        action.addLast(actionNumber);
+        Observable.interval(1, TimeUnit.SECONDS).takeWhile(l1 -> !action.isEmpty() && action.peekFirst() <= actionNumber).subscribe(l2 -> {
+            if (isFree && action.peekFirst() == actionNumber) {
+                action.pollFirst();
+                isFree = false;
+                Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+                    currentRoom = room;
+                    diner.clean(currentRoom);
 
-            useToilet();
+                    useToilet();
+                });
+            }
         });
     }
 

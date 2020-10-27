@@ -11,7 +11,7 @@ repositories {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "lib", "include" to listOf("*.jar"))))
-    implementation(files("/src/main/java/ru/virgil/java-diner-signal-source-2.2.0.jar"))
+    implementation(files("/src/main/java/ru/virgil/java-diner-signal-source-2.3.0.jar"))
 }
 
 configure<JavaPluginConvention> {

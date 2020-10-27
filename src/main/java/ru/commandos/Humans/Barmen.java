@@ -11,6 +11,9 @@ import ru.commandos.Order;
 import ru.commandos.Rooms.Bar;
 import ru.commandos.Rooms.Room;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -18,6 +21,9 @@ import java.util.concurrent.TimeUnit;
 public class Barmen extends Staff implements Observer<String> {
 
     private final Bar bar;
+    private boolean isFree = true;
+    private long actionCount;
+    private final Deque<Long> action = new ArrayDeque<>();
 
     public Barmen(Diner diner, Bar bar) {
         super(diner);
@@ -36,22 +42,24 @@ public class Barmen extends Staff implements Observer<String> {
         Logger.debug("Бармен сделал напитки " + order);
         currentRoom.getDirty();
 
-        useToilet();
-
         if (order.orderPlace != Room.OrderPlace.BAR || !order.dishes.isEmpty()) {
             bar.transfer(order);
+            isFree = true;
         } else {
             setReadyOrder(order);
         }
     }
 
     private void acceptOrder(Integer chairNumber) {
-        Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> bar.getClient(chairNumber).setMenu(diner.getMenu()));
+        Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+            bar.getClient(chairNumber).setMenu(diner.getMenu());
+        });
         Observable.timer(2, TimeUnit.SECONDS).subscribe(v -> {
             Order order = bar.getClient(chairNumber).getOrder();
             if (order.cost == 0.) {
                 Logger.info("Клиент ничего не заказал");
                 bar.clientGone(order.table);
+                isFree = true;
             } else {
                 Logger.info("Бармен взял заказ в баре: " + order);
                 transferOrder(order);
@@ -61,9 +69,11 @@ public class Barmen extends Staff implements Observer<String> {
 
     private void transferOrder(Order order) {
         if (!order.drinks.isEmpty()) {
+            Logger.debug("Бармен начал готовить напитки");
             Observable.timer(5, TimeUnit.SECONDS).subscribe(v -> shake(order));
         } else {
             bar.transfer(order);
+            isFree = true;
         }
     }
 
@@ -73,11 +83,14 @@ public class Barmen extends Staff implements Observer<String> {
             bar.getClient(order.table).setOrder(order);
         });
         Observable.timer(2, TimeUnit.SECONDS).subscribe(v -> {
-        changeMoney(bar.getClient(order.table).pay());
-        bar.clientGone(order.table);
+            changeMoney(bar.getClient(order.table).pay());
+            bar.clientGone(order.table);
         });
         Observable.timer(3, TimeUnit.SECONDS).subscribe(v -> {
-        givePaymentToBookkeeper();
+            givePaymentToBookkeeper();
+
+            useToilet();
+            isFree = true;
         });
     }
 
@@ -90,8 +103,8 @@ public class Barmen extends Staff implements Observer<String> {
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
             Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
-            Logger.info(this.getClass().getSimpleName() + " воспользовался туалетом");
-            diner.getHall().getToilet().getDirty();
+                Logger.info(this.getClass().getSimpleName() + " воспользовался туалетом");
+                diner.getHall().getToilet().getDirty();
             });
         }
     }
@@ -103,12 +116,29 @@ public class Barmen extends Staff implements Observer<String> {
 
     @Override
     public void onNext(@NonNull String s) {
-        if (s.equals(Waiter.class.getSimpleName())) {
-            Observable.timer(5, TimeUnit.SECONDS).subscribe(v -> shake(bar.getWaitOrder()));
-        } else {
-            Integer table = Integer.parseInt(new StringBuffer(s).delete(0, 3).toString());
-            acceptOrder(table);
+        if (action.isEmpty() && actionCount > 30) {
+            actionCount = 1;
         }
+        long actionNumber = actionCount++;
+        action.addLast(actionNumber);
+        Observable.interval(1, TimeUnit.SECONDS).takeWhile(l1 -> !action.isEmpty() && action.peekFirst() <= actionNumber).subscribe(l2 -> {
+            if (isFree && action.peekFirst() == actionNumber) {
+                action.pollFirst();
+                isFree = false;
+                if (s.equals(Waiter.class.getSimpleName())) {
+                    Order order = bar.getWaitOrder();
+                    if (order.orderPlace.equals(Room.OrderPlace.BAR)) {
+                        setReadyOrder(order);
+                    } else {
+                        Logger.debug("Бармен начал готовить напитки");
+                        Observable.timer(5, TimeUnit.SECONDS).subscribe(v -> shake(order));
+                    }
+                } else {
+                    Integer table = Integer.parseInt(new StringBuffer(s).delete(0, 3).toString());
+                    acceptOrder(table);
+                }
+            }
+        });
     }
 
     @Override

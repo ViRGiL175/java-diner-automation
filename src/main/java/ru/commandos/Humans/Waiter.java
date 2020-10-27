@@ -9,6 +9,8 @@ import ru.commandos.Diner;
 import ru.commandos.Order;
 import ru.commandos.Rooms.*;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -17,6 +19,9 @@ public class Waiter extends Staff implements Observer<String> {
     Order order;
     Kitchen kitchen;
     DriveThru driveThru;
+    private boolean isFree = true;
+    private long actionCount;
+    private final Deque<Long> action = new ArrayDeque<>();
 
     public Waiter(Diner diner, Kitchen kitchen, DriveThru driveThru) {
         super(diner);
@@ -32,6 +37,7 @@ public class Waiter extends Staff implements Observer<String> {
             if (order.cost == 0.) {
                 Logger.info("Клиент ничего не заказал");
                 diner.getHall().getTables().clientGone(order.table);
+                isFree = true;
             } else {
                 Logger.info("Официант взял заказ в Зале: " + order);
                 transferOrder(order);
@@ -47,6 +53,7 @@ public class Waiter extends Staff implements Observer<String> {
             if (order.cost == 0.) {
                 Logger.info("Клиент ничего не заказал");
                 driveThru.carGone();
+                isFree = true;
             } else {
                 Logger.info("Официант взял заказ на Драйв-тру: " + order);
                 transferOrder(order);
@@ -66,6 +73,7 @@ public class Waiter extends Staff implements Observer<String> {
                 Logger.debug("Заказ передан в бар " + order);
                 diner.getHall().getBar().acceptOrder(order);
             }
+            isFree = true;
         });
     }
 
@@ -92,7 +100,7 @@ public class Waiter extends Staff implements Observer<String> {
                     givePaymentToBookkeeper();
                 });
             } else {
-                diner.getBarmen().setReadyOrder(order);
+                diner.getHall().getBar().acceptOrder(order);
             }
 
             useToilet();
@@ -104,6 +112,7 @@ public class Waiter extends Staff implements Observer<String> {
             move(kitchen);
             Logger.debug("Заказ передан в кухню " + order);
             kitchen.acceptOrder(order);
+            isFree = true;
         });
     }
 
@@ -121,7 +130,11 @@ public class Waiter extends Staff implements Observer<String> {
             Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
                 Logger.info(this.getClass().getSimpleName() + " воспользовался туалетом");
                 diner.getHall().getToilet().getDirty();
+                isFree = true;
             });
+        }
+        else {
+            isFree = true;
         }
     }
 
@@ -131,24 +144,41 @@ public class Waiter extends Staff implements Observer<String> {
 
     @Override
     public void onNext(@NonNull String s) {
-        if (s.equals(DriveThru.class.getSimpleName())) {
-            acceptDriveThruOrder();
-        } else if (s.equals(Kitchen.class.getSimpleName())) {
-            order = kitchen.getReadyOrder();
-            if (order.isready()) {
-                carryOrder(order);
-            }
-        } else if (s.equals(Bar.class.getSimpleName())) {
-            order = diner.getHall().getBar().getReadyOrder();
-            if (order.orderPlace == Room.OrderPlace.BAR) {
-                transferOrderFromBar(order);
-            } else if (order.isready()) {
-                carryOrder(order);
-            }
-        } else {
-            Integer table = Integer.parseInt(new StringBuffer(s).delete(0, 6).toString());
-            acceptTablesOrder(table);
+        if (action.isEmpty() && actionCount > 30) {
+            actionCount = 1;
         }
+        long actionNumber = actionCount++;
+        action.addLast(actionNumber);
+        Observable.interval(1, TimeUnit.SECONDS).takeWhile(l1 -> !action.isEmpty() && action.peekFirst() <= actionNumber).subscribe(l2 -> {
+            if (isFree && action.peekFirst() == actionNumber) {
+                action.pollFirst();
+                isFree = false;
+                if (s.equals(DriveThru.class.getSimpleName())) {
+                    acceptDriveThruOrder();
+                } else if (s.equals(Kitchen.class.getSimpleName())) {
+                    order = kitchen.getReadyOrder();
+                    if (order.isready()) {
+                        carryOrder(order);
+                    }
+                    else {
+                        isFree = true;
+                    }
+                } else if (s.equals(Bar.class.getSimpleName())) {
+                    order = diner.getHall().getBar().getReadyOrder();
+                    if (order.orderPlace == Room.OrderPlace.BAR) {
+                        transferOrderFromBar(order);
+                    } else if (order.isready()) {
+                        carryOrder(order);
+                    }
+                    else {
+                        isFree = true;
+                    }
+                } else {
+                    Integer table = Integer.parseInt(new StringBuffer(s).delete(0, 6).toString());
+                    acceptTablesOrder(table);
+                }
+            }
+        });
     }
 
     @Override

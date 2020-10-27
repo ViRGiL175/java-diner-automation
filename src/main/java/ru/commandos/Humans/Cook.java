@@ -10,13 +10,18 @@ import ru.commandos.Food.Dish.Dish;
 import ru.commandos.Order;
 import ru.commandos.Rooms.Kitchen;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 
 public class Cook extends Staff implements Observer<Order> {
 
-    private Kitchen kitchen;
+    private final Kitchen kitchen;
+    private boolean isFree = true;
+    private long actionCount;
+    private final Deque<Long> action = new ArrayDeque<>();
 
     public Cook(Diner diner, Kitchen kitchen) {
         super(diner);
@@ -33,18 +38,24 @@ public class Cook extends Staff implements Observer<Order> {
         }
         currentRoom.getDirty();
 
-        useToilet();
-
         Logger.info("ингредиентов осталось на кухне: " + kitchen.checkIngredients());
         Logger.debug("Повар приготовил блюда " + order);
         kitchen.transferDish(order);
+
+        useToilet();
     }
 
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
-            Logger.info(this.getClass().getSimpleName() + " воспользовался туалетом");
-            diner.getHall().getToilet().getDirty();
+            Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+                Logger.info(this.getClass().getSimpleName() + " воспользовался туалетом");
+                diner.getHall().getToilet().getDirty();
+                isFree = true;
+            });
+        }
+        else {
+            isFree = true;
         }
     }
 
@@ -55,8 +66,19 @@ public class Cook extends Staff implements Observer<Order> {
 
     @Override
     public void onNext(@NonNull Order order) {
-        Logger.debug("Повар готовит " + order);
-        Observable.timer(5, TimeUnit.SECONDS).subscribe(v -> cook(order));
+        if (action.isEmpty() && actionCount > 30) {
+            actionCount = 1;
+        }
+        long actionNumber = actionCount++;
+        action.addLast(actionNumber);
+        Observable.interval(1, TimeUnit.SECONDS).takeWhile(l1 -> !action.isEmpty() && action.peekFirst() <= actionNumber).subscribe(l2 -> {
+            if (isFree && action.peekFirst() == actionNumber) {
+                action.pollFirst();
+                isFree = false;
+                Logger.debug("Повар готовит " + order);
+                Observable.timer(5, TimeUnit.SECONDS).subscribe(v -> cook(order));
+            }
+        });
     }
 
     @Override

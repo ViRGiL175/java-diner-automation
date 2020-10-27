@@ -45,12 +45,12 @@ public class Bar extends Room {
     }
 
     public void acceptOrder(Order order) {
-        waitOrder.add(order);
+        waitOrder.addLast(order);
         barmenCaller.onNext(Waiter.class.getSimpleName());
     }
 
     public void transfer(Order order) {
-        readyOrder.add(order);
+        readyOrder.addLast(order);
         waiterCaller.onNext(Bar.class.getSimpleName());
     }
 
