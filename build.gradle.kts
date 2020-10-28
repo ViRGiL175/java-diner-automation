@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "ru.commandos"
-version = "1.0.0"
+version = "1.1.0"
 
 repositories {
     mavenCentral()
@@ -22,4 +22,9 @@ dependencies {
     testImplementation("junit", "junit", "4.12")
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation("com.google.code.gson:gson:2.8.6")
+}
+
+configure<JavaPluginConvention> {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
