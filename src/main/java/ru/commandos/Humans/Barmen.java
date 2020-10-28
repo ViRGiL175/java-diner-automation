@@ -52,10 +52,10 @@ public class Barmen extends Staff implements Observer<String> {
     }
 
     private void acceptOrder(Integer chairNumber) {
-        Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+        Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
             bar.getClient(chairNumber).setMenu(diner.getMenu());
         });
-        Observable.timer(2, TimeUnit.SECONDS).subscribe(v -> {
+        Observable.timer(2 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
             Order order = bar.getClient(chairNumber).getOrder();
             if (order.cost == 0.) {
                 Logger.info("Client hasn't ordered");
@@ -75,7 +75,7 @@ public class Barmen extends Staff implements Observer<String> {
                 bar.transfer(order);
             }
             Logger.debug("Barmen is shaking drinks");
-            Observable.timer(5, TimeUnit.SECONDS).subscribe(v -> shake(order));
+            Observable.timer(5 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> shake(order));
         } else {
             bar.transfer(order);
             isFree = true;
@@ -83,15 +83,23 @@ public class Barmen extends Staff implements Observer<String> {
     }
 
     public void setReadyOrder(Order order) {
-        Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+        Client client = bar.getClient(order.table);
+        Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
             Logger.debug("Barmen gives the order to Client " + order);
-            bar.getClient(order.table).setOrder(order);
+            client.setOrder(order);
         });
-        Observable.timer(2, TimeUnit.SECONDS).subscribe(v -> {
-            changeMoney(bar.getClient(order.table).pay());
-            bar.clientGone(order.table);
+        Observable.timer(2 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
+            changeMoney(client.pay());
+            if ((client.getMoney() < diner.getMenu().food.values().stream().min(Double::compare).get()
+                    && client.getMoney() < diner.getMenu().drinks.values().stream().min(Double::compare).get())
+                    || new Random().nextInt(10) > 3) {
+                bar.clientGone(order.table);
+            }
+            else {
+                bar.reOrder(order.table);
+            }
         });
-        Observable.timer(3, TimeUnit.SECONDS).subscribe(v -> {
+        Observable.timer(3 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
             givePaymentToBookkeeper();
 
             useToilet();
@@ -107,7 +115,7 @@ public class Barmen extends Staff implements Observer<String> {
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
-            Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+            Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
                 Logger.info(this.getClass().getSimpleName() + " used Toilet");
                 diner.getHall().getToilet().getDirty();
             });
@@ -133,7 +141,7 @@ public class Barmen extends Staff implements Observer<String> {
             actionNumber = actionCount++;
             action.addLast(actionNumber);
         }
-        Observable.interval(1, TimeUnit.SECONDS).takeWhile(l1 -> !action.isEmpty() && action.peekFirst() <= actionNumber).subscribe(l2 -> {
+        Observable.interval(1 * Diner.slowdown, TimeUnit.MILLISECONDS).takeWhile(l1 -> !action.isEmpty() && action.peekFirst() <= actionNumber).subscribe(l2 -> {
             if (isFree && action.peekFirst() == actionNumber) {
                 action.pollFirst();
                 isFree = false;
@@ -143,7 +151,7 @@ public class Barmen extends Staff implements Observer<String> {
                         setReadyOrder(order);
                     } else {
                         Logger.debug("Barmen is shaking drinks");
-                        Observable.timer(5, TimeUnit.SECONDS).subscribe(v -> shake(order));
+                        Observable.timer(5 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> shake(order));
                     }
                 } else {
                     Integer table = Integer.parseInt(new StringBuffer(s).delete(0, 3).toString());

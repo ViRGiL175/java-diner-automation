@@ -2,6 +2,7 @@ package ru.commandos.Humans;
 
 import io.reactivex.rxjava3.core.Observable;
 import org.tinylog.Logger;
+import ru.commandos.Diner;
 import ru.commandos.Food.Dish.Dish;
 import ru.commandos.Food.Drink.Drink;
 import ru.commandos.Menu;
@@ -18,10 +19,11 @@ import java.util.concurrent.TimeUnit;
 public class Client extends Human {
 
     private Room.OrderPlace orderPlace;
-    private Integer table;
     private Menu menu;
     private String uuid;
     private Order order;
+
+    public Integer table;
 
     public void setOrderPlace(Room.OrderPlace orderPlace) {
         this.orderPlace = orderPlace;
@@ -98,7 +100,7 @@ public class Client extends Human {
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
-            Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+            Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
                 Logger.info(this.getClass().getSimpleName() + " used Toilet");
                 if (currentRoom instanceof Tables) {
                     ((Tables) currentRoom).getToilet().getDirty();

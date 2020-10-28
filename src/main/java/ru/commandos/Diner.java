@@ -12,6 +12,8 @@ import java.util.Random;
 
 public class Diner {
 
+    public static int slowdown = 1000;
+
     protected final PublishSubject<Room> cleanerCaller = PublishSubject.create();
 
     private final Menu menu = new Menu();

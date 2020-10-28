@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Tables extends Room {
 
-    private Diner diner;
+    private final Diner diner;
     private final ArrayList<Client> tables = new ArrayList<>();
     private final HashSet<Integer> freePlace = new HashSet<>();
 
@@ -25,14 +25,14 @@ public class Tables extends Room {
         }
     }
 
-    private final PublishSubject<String> caller = PublishSubject.create();
+    private final PublishSubject<String> waiterCaller = PublishSubject.create();
 
     public Tables(Diner diner) {
         this.diner = diner;
     }
 
     public void subscribe(Waiter waiter) {
-        caller.subscribe(waiter);
+        waiterCaller.subscribe(waiter);
         Logger.info("Waiter is ready to work");
     }
 
@@ -49,13 +49,20 @@ public class Tables extends Room {
             client.setTable(table);
             tables.set(table, client);
             freePlace.remove(table);
-            Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+            Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
                 Logger.info(client + " ready to do order!");
-                caller.onNext(Tables.class.getSimpleName() + table);
+                waiterCaller.onNext(Tables.class.getSimpleName() + table);
             });
         } else {
             Logger.warn("No place!");
         }
+    }
+
+    public void reOrder(Integer table) {
+        Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
+            Logger.info(getClient(table) + " ready to do order again!");
+            waiterCaller.onNext(Tables.class.getSimpleName() + table);
+        });
     }
 
     public void clientGone(Integer table) {

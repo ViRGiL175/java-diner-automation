@@ -64,13 +64,20 @@ public class Bar extends Room {
             client.setTable(chair);
             chairs.set(chair, client);
             freePlace.remove(chair);
-            Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+            Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
                 Logger.info(client + " ready to do order!");
                 barmenCaller.onNext(Bar.class.getSimpleName() + chair);
             });
         } else {
             Logger.info("No place!");
         }
+    }
+
+    public void reOrder(Integer chair) {
+        Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
+            Logger.info(getClient(chair) + " ready to do order again!");
+            barmenCaller.onNext(Bar.class.getSimpleName() + chair);
+        });
     }
 
     public void clientGone(Integer chair) {

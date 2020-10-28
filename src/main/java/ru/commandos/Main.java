@@ -8,7 +8,9 @@ public class Main {
 
     public static void main(String[] args) {
 
-        OuterWorld outerWorld = OuterWorld.singleton(30, TimeUnit.SECONDS);
+        Diner.slowdown = 1000;
+
+        OuterWorld outerWorld = OuterWorld.singleton(20 * Diner.slowdown, TimeUnit.MILLISECONDS);
 
         Diner diner = new Diner(outerWorld.getClientsSource(), outerWorld.getDateSource());
 

@@ -48,7 +48,7 @@ public class Cook extends Staff implements Observer<Order> {
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
-            Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+            Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
                 Logger.info(this.getClass().getSimpleName() + " used Toilet");
                 diner.getHall().getToilet().getDirty();
                 isFree = true;
@@ -71,12 +71,12 @@ public class Cook extends Staff implements Observer<Order> {
         }
         long actionNumber = actionCount++;
         action.addLast(actionNumber);
-        Observable.interval(1, TimeUnit.SECONDS).takeWhile(l1 -> !action.isEmpty() && action.peekFirst() <= actionNumber).subscribe(l2 -> {
+        Observable.interval(1 * Diner.slowdown, TimeUnit.MILLISECONDS).takeWhile(l1 -> !action.isEmpty() && action.peekFirst() <= actionNumber).subscribe(l2 -> {
             if (isFree && action.peekFirst() == actionNumber) {
                 action.pollFirst();
                 isFree = false;
                 Logger.debug("Cook is cooking " + order);
-                Observable.timer(5, TimeUnit.SECONDS).subscribe(v -> cook(order));
+                Observable.timer(5 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> cook(order));
             }
         });
     }
