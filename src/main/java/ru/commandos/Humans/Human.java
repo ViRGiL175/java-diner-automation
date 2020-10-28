@@ -7,7 +7,7 @@ abstract public class Human {
     protected Room currentRoom;
     protected String money = "$0";
 
-    protected Double getMoney() {
+    public Double getMoney() {
         return Double.parseDouble(new StringBuffer(money).delete(0, 1).toString());
     }
 

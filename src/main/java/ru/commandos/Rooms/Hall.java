@@ -48,11 +48,15 @@ public class Hall implements Observer<String> {
     public void onNext(@NonNull String s) {
         Gson gson = new Gson();
         Client client = gson.fromJson(s, Client.class);
-        if (new Random().nextInt(10) > 3) {
-            tables.setClient(client);
-        }
-        else {
-            bar.setClient(client);
+        if (client.getMoney() >= diner.getMenu().food.values().stream().min(Double::compare).get()
+                || client.getMoney() >= diner.getMenu().drinks.values().stream().min(Double::compare).get()) {
+            if (new Random().nextInt(10) > 3) {
+                tables.setClient(client);
+            } else {
+                bar.setClient(client);
+            }
+        } else {
+            Logger.warn(client + " did't enter, because he haven't money");
         }
     }
 
