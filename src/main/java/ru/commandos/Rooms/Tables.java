@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Tables extends Room {
 
-    private Diner diner;
+    private final Diner diner;
     private final ArrayList<Client> tables = new ArrayList<>();
     private final HashSet<Integer> freePlace = new HashSet<>();
 
@@ -49,7 +49,7 @@ public class Tables extends Room {
             client.setTable(table);
             tables.set(table, client);
             freePlace.remove(table);
-            Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+            Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
                 Logger.info(client + " ready to do order!");
                 waiterCaller.onNext(Tables.class.getSimpleName() + table);
             });
@@ -59,7 +59,7 @@ public class Tables extends Room {
     }
 
     public void reOrder(Integer table) {
-        Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+        Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
             Logger.info(getClient(table) + " ready to do order again!");
             waiterCaller.onNext(Tables.class.getSimpleName() + table);
         });

@@ -30,7 +30,7 @@ public class Waiter extends Staff implements Observer<String> {
     }
 
     public void acceptTablesOrder(Integer tableNumber) {
-        Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+        Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
             move(diner.getHall().getTables());
             diner.getHall().getTables().getClient(tableNumber).setMenu(diner.getMenu());
             order = diner.getHall().getTables().getClient(tableNumber).getOrder();
@@ -46,7 +46,7 @@ public class Waiter extends Staff implements Observer<String> {
     }
 
     public void acceptDriveThruOrder() {
-        Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+        Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
             move(diner.getDriveThru());
             driveThru.getCar().setMenu(diner.getMenu());
             order = driveThru.getCar().getOrder();
@@ -62,7 +62,7 @@ public class Waiter extends Staff implements Observer<String> {
     }
 
     private void transferOrder(Order order) {
-        Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+        Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
             if (!order.dishes.isEmpty()) {
                 move(kitchen);
                 Logger.debug("Order has been transferred to Kitchen " + order);
@@ -79,21 +79,21 @@ public class Waiter extends Staff implements Observer<String> {
 
     private void carryOrder(Order order) {
         Logger.debug("Waiter took the ready Order");
-        Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+        Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
             if (order.orderPlace == Room.OrderPlace.DRIVETHRU) {
                 move(driveThru);
                 driveThru.getCar().setOrder(order);
-                Observable.timer(1, TimeUnit.SECONDS).subscribe(s -> {
+                Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(s -> {
                     changeMoney(driveThru.carGone().pay());
                 });
-                Observable.timer(2, TimeUnit.SECONDS).subscribe(s -> {
+                Observable.timer(2 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(s -> {
                     givePaymentToBookkeeper();
                 });
             } else if (order.orderPlace == Room.OrderPlace.TABLES) {
                 move(diner.getHall().getTables());
                 Client client = diner.getHall().getTables().getClient(order.table);
                 client.setOrder(order);
-                Observable.timer(1, TimeUnit.SECONDS).subscribe(s -> {
+                Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(s -> {
                     changeMoney(client.pay());
                     if ((client.getMoney() < diner.getMenu().food.values().stream().min(Double::compare).get()
                             && client.getMoney() < diner.getMenu().drinks.values().stream().min(Double::compare).get())
@@ -103,7 +103,7 @@ public class Waiter extends Staff implements Observer<String> {
                         diner.getHall().getTables().reOrder(order.table);
                     }
                 });
-                Observable.timer(2, TimeUnit.SECONDS).subscribe(s -> {
+                Observable.timer(2 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(s -> {
                     givePaymentToBookkeeper();
                 });
             } else {
@@ -115,7 +115,7 @@ public class Waiter extends Staff implements Observer<String> {
     }
 
     private void transferOrderFromBar(Order order) {
-        Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+        Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
             move(kitchen);
             Logger.debug("Order has been transferred to Kitchen " + order);
             kitchen.acceptOrder(order);
@@ -124,7 +124,7 @@ public class Waiter extends Staff implements Observer<String> {
     }
 
     private void givePaymentToBookkeeper() {
-        Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+        Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
             move(diner.getBookkeeping());
             diner.getBookkeeper().giveClientPayment(getMoney());
             money = "$0";
@@ -134,7 +134,7 @@ public class Waiter extends Staff implements Observer<String> {
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
-            Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+            Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
                 Logger.info(this.getClass().getSimpleName() + " used Toilet");
                 diner.getHall().getToilet().getDirty();
                 isFree = true;
@@ -155,7 +155,7 @@ public class Waiter extends Staff implements Observer<String> {
         }
         long actionNumber = actionCount++;
         action.addLast(actionNumber);
-        Observable.interval(1, TimeUnit.SECONDS).takeWhile(l1 -> !action.isEmpty() && action.peekFirst() <= actionNumber).subscribe(l2 -> {
+        Observable.interval(1 * Diner.slowdown, TimeUnit.MILLISECONDS).takeWhile(l1 -> !action.isEmpty() && action.peekFirst() <= actionNumber).subscribe(l2 -> {
             if (isFree && action.peekFirst() == actionNumber) {
                 action.pollFirst();
                 isFree = false;
