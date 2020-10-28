@@ -73,6 +73,13 @@ public class Bar extends Room {
         }
     }
 
+    public void reOrder(Integer chair) {
+        Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
+            Logger.info(getClient(chair) + " ready to do order again!");
+            barmenCaller.onNext(Bar.class.getSimpleName() + chair);
+        });
+    }
+
     public void clientGone(Integer chair) {
         chairs.set(chair, null);
         freePlace.add(chair);

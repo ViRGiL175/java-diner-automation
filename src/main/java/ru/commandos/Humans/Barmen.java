@@ -83,13 +83,21 @@ public class Barmen extends Staff implements Observer<String> {
     }
 
     public void setReadyOrder(Order order) {
+        Client client = bar.getClient(order.table);
         Observable.timer(1, TimeUnit.SECONDS).subscribe(v -> {
             Logger.debug("Barmen gives the order to Client " + order);
-            bar.getClient(order.table).setOrder(order);
+            client.setOrder(order);
         });
         Observable.timer(2, TimeUnit.SECONDS).subscribe(v -> {
-            changeMoney(bar.getClient(order.table).pay());
-            bar.clientGone(order.table);
+            changeMoney(client.pay());
+            if ((client.getMoney() < diner.getMenu().food.values().stream().min(Double::compare).get()
+                    && client.getMoney() < diner.getMenu().drinks.values().stream().min(Double::compare).get())
+                    || new Random().nextInt(10) > 3) {
+                bar.clientGone(order.table);
+            }
+            else {
+                bar.reOrder(order.table);
+            }
         });
         Observable.timer(3, TimeUnit.SECONDS).subscribe(v -> {
             givePaymentToBookkeeper();

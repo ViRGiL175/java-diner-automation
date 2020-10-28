@@ -18,10 +18,11 @@ import java.util.concurrent.TimeUnit;
 public class Client extends Human {
 
     private Room.OrderPlace orderPlace;
-    private Integer table;
     private Menu menu;
     private String uuid;
     private Order order;
+
+    public Integer table;
 
     public void setOrderPlace(Room.OrderPlace orderPlace) {
         this.orderPlace = orderPlace;
