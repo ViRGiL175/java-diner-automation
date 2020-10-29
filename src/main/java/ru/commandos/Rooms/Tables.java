@@ -66,9 +66,11 @@ public class Tables extends Room {
     }
 
     public void clientGone(Integer table) {
+        Client client = getClient(table);
+        diner.feedback(client);
         tables.set(table, null);
         freePlace.add(table);
-        Logger.info("Client is gone, table #" + table + " is free");
+        Logger.info("Client is gone (feedback: " + client.feedback + "), chair #" + table + " is free");
     }
 
     public Toilet getToilet() {

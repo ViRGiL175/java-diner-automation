@@ -18,12 +18,17 @@ import java.util.concurrent.TimeUnit;
 
 public class Client extends Human {
 
+    public enum Feedback {
+        PERFECT, GOOD, AVERAGE, BELOW_AVERAGE, BAD
+    }
+
     private Room.OrderPlace orderPlace;
     private Menu menu;
     private String uuid;
     private Order order;
 
     public Integer table;
+    public Feedback feedback;
 
     public void setOrderPlace(Room.OrderPlace orderPlace) {
         this.orderPlace = orderPlace;
@@ -42,6 +47,10 @@ public class Client extends Human {
     public void setMenu(Menu menu) {
         this.menu = menu;
         Logger.info(this + " got a menu");
+    }
+
+    public Room.OrderPlace getOrderPlace() {
+        return orderPlace;
     }
 
     public Order getOrder() {
