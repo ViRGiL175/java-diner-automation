@@ -81,9 +81,11 @@ public class Bar extends Room {
     }
 
     public void clientGone(Integer chair) {
+        Client client = getClient(chair);
+        diner.feedback(client);
         chairs.set(chair, null);
         freePlace.add(chair);
-        Logger.info("Client is gone, chair #" + chair + " is free");
+        Logger.info("Client is gone (feedback: " + client.feedback + "), chair #" + chair + " is free");
     }
 
     public void getIngredients(String ingredient, Integer count) {

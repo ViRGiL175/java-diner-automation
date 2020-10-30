@@ -79,6 +79,35 @@ public class Diner {
         Logger.info("Cleaner tidied up in " + room.getClass().getSimpleName());
     }
 
+    public void feedback(Client client) {
+        double dirt;
+        if (client.getOrderPlace() == Room.OrderPlace.DRIVETHRU){
+            dirt = ((double) (roomDirt.get(driveThru) + roomDirt.get(kitchen) + roomDirt.get(hall.getBar()))) / (maxRoomDirt.get(driveThru) + maxRoomDirt.get(kitchen) + maxRoomDirt.get(hall.getBar()));
+        }
+        else {
+            dirt = (double)hashMapValuesSum(roomDirt) / hashMapValuesSum(maxRoomDirt);
+        }
+        if (dirt <= 0.1) {
+            client.feedback = Client.Feedback.PERFECT;
+        } else if (dirt <= 0.3) {
+            client.feedback = Client.Feedback.GOOD;
+        } else if (dirt <= 0.5) {
+            client.feedback = Client.Feedback.AVERAGE;
+        } else if (dirt <= 0.7) {
+            client.feedback = Client.Feedback.BELOW_AVERAGE;
+        } else {
+            client.feedback = Client.Feedback.BAD;
+        }
+    }
+
+    public int hashMapValuesSum(HashMap<Room, Integer> map) {
+        int sum = 0;
+        for (Room room : map.keySet()) {
+            sum += map.get(room);
+        }
+        return sum;
+    }
+
     public Menu getMenu() {
         return menu;
     }

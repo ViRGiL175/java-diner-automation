@@ -27,6 +27,7 @@ public class DriveThru extends Room implements Observer<String> {
     }
 
     public Client carGone() {
+        diner.feedback(getCar());
         return cars.pollFirst();
     }
 
