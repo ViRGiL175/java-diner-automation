@@ -12,7 +12,7 @@ public class Main {
 
         OuterWorld outerWorld = OuterWorld.singleton(20 * Diner.slowdown, TimeUnit.MILLISECONDS);
 
-        Diner diner = new Diner(outerWorld.getClientsSource(), outerWorld.getDateSource());
+        Diner diner = new Diner(outerWorld.getClientsSource(), outerWorld.getAutoClientsSource(), outerWorld.getDateSource());
 
         outerWorld.run();
     }

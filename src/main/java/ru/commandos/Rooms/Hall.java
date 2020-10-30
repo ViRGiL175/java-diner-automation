@@ -40,8 +40,8 @@ public class Hall implements Observer<String> {
     public void onSubscribe(@NonNull Disposable d) {
         Logger.info("Hall is open");
         bar.subscribe(diner.getBarmen());
-        bar.subscribe(diner.getWaiter());
-        tables.subscribe(diner.getWaiter());
+        bar.subscribe(diner.getWaiterController());
+        tables.subscribe(diner.getWaiterController());
     }
 
     @Override

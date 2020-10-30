@@ -6,6 +6,7 @@ import org.tinylog.Logger;
 import ru.commandos.Diner;
 import ru.commandos.Humans.Client;
 import ru.commandos.Humans.Waiter;
+import ru.commandos.Humans.WaiterController;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -31,9 +32,9 @@ public class Tables extends Room {
         this.diner = diner;
     }
 
-    public void subscribe(Waiter waiter) {
-        waiterCaller.subscribe(waiter);
-        Logger.info("Waiter is ready to work");
+    public void subscribe(WaiterController waiterController) {
+        waiterCaller.subscribe(waiterController);
+        Logger.info("Waiters is ready to work");
     }
 
     public Client getClient(Integer tableNumber) {

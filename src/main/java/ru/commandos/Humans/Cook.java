@@ -23,9 +23,12 @@ public class Cook extends Staff implements Observer<Order> {
     private long actionCount;
     private final Deque<Long> action = new ArrayDeque<>();
 
-    public Cook(Diner diner, Kitchen kitchen) {
+    private int number;
+
+    public Cook(Diner diner, Kitchen kitchen, int number) {
         super(diner);
         this.kitchen = kitchen;
+        this.number = number;
         currentRoom = kitchen;
     }
 
@@ -39,10 +42,14 @@ public class Cook extends Staff implements Observer<Order> {
         currentRoom.getDirty();
 
         Logger.info("List of remaining ingredients in the Kitchen: " + kitchen.checkIngredients());
-        Logger.debug("Cook cooked dishes " + order);
+        Logger.debug("Cook " + number + " cooked dishes " + order);
         kitchen.transferDish(order);
 
         useToilet();
+    }
+
+    public int getActionSize() {
+        return action.size();
     }
 
     @Override
@@ -61,7 +68,6 @@ public class Cook extends Staff implements Observer<Order> {
 
     @Override
     public void onSubscribe(@NonNull Disposable d) {
-        Logger.info("Cook is ready to work");
     }
 
     @Override
@@ -75,7 +81,7 @@ public class Cook extends Staff implements Observer<Order> {
             if (isFree && action.peekFirst() == actionNumber) {
                 action.pollFirst();
                 isFree = false;
-                Logger.debug("Cook is cooking " + order);
+                Logger.debug("Cook " + number + " is cooking " + order);
                 Observable.timer(5 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> cook(order));
             }
         });

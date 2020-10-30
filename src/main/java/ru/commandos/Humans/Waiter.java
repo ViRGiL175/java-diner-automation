@@ -16,16 +16,19 @@ import java.util.concurrent.TimeUnit;
 
 public class Waiter extends Staff implements Observer<String> {
 
-    Order order;
-    Kitchen kitchen;
-    DriveThru driveThru;
+    private Order order;
+    private final Kitchen kitchen;
+    private final DriveThru driveThru;
     private boolean isFree = true;
     private long actionCount;
     private final Deque<Long> action = new ArrayDeque<>();
 
-    public Waiter(Diner diner, Kitchen kitchen, DriveThru driveThru) {
+    private int number;
+
+    public Waiter(Diner diner, Kitchen kitchen, DriveThru driveThru, int number) {
         super(diner);
         this.kitchen = kitchen;
+        this.number = number;
         this.driveThru = driveThru;
     }
 
@@ -39,7 +42,7 @@ public class Waiter extends Staff implements Observer<String> {
                 diner.getHall().getTables().clientGone(order.table);
                 isFree = true;
             } else {
-                Logger.info("Waiter took Order at Tables: " + order);
+                Logger.info("Waiter " + number + " took Order at Tables: " + order);
                 transferOrder(order);
             }
         });
@@ -55,7 +58,7 @@ public class Waiter extends Staff implements Observer<String> {
                 driveThru.carGone();
                 isFree = true;
             } else {
-                Logger.info("Waiter took Order at Drive-Thru: " + order);
+                Logger.info("Waiter " + number + " took Order at Drive-Thru: " + order);
                 transferOrder(order);
             }
         });
@@ -78,7 +81,7 @@ public class Waiter extends Staff implements Observer<String> {
     }
 
     private void carryOrder(Order order) {
-        Logger.debug("Waiter took the ready Order");
+        Logger.debug("Waiter " + number + " took the ready Order");
         Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
             if (order.orderPlace == Room.OrderPlace.DRIVETHRU) {
                 move(driveThru);
@@ -131,6 +134,10 @@ public class Waiter extends Staff implements Observer<String> {
         });
     }
 
+    public int getActionSize() {
+        return action.size();
+    }
+
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
@@ -164,6 +171,7 @@ public class Waiter extends Staff implements Observer<String> {
                 } else if (s.equals(Kitchen.class.getSimpleName())) {
                     order = kitchen.getReadyOrder();
                     if (order.isready() && !order.placed) {
+                        order.placed = true;
                         carryOrder(order);
                     } else {
                         isFree = true;
@@ -173,6 +181,7 @@ public class Waiter extends Staff implements Observer<String> {
                     if (order.orderPlace == Room.OrderPlace.BAR) {
                         transferOrderFromBar(order);
                     } else if (order.isready() && !order.placed) {
+                        order.placed = true;
                         carryOrder(order);
                     } else {
                         isFree = true;

@@ -20,9 +20,9 @@ public class Diner {
     private final Hall hall = new Hall(this);
     private final DriveThru driveThru = new DriveThru(this);
     private final Kitchen kitchen = new Kitchen(this);
-    private final Cook cook = new Cook(this, kitchen);
     private final Barmen barmen = new Barmen(this, hall.getBar());
-    private final Waiter waiter = new Waiter(this, kitchen, driveThru);
+    private final CookController cookController = new CookController(this);
+    private final WaiterController waiterController = new WaiterController(this);
     private final Bookkeeping bookkeeping = new Bookkeeping(this);
     private final Bookkeeper bookkeeper = new Bookkeeper(this, bookkeeping);
     private final Cleaner cleaner = new Cleaner(this);
@@ -53,16 +53,16 @@ public class Diner {
         maxRoomDirtSpeed.put(hall.getToilet(), 10);
     }
 
-    public Diner(Observable<String> jsonObservable, Observable<Date> dateObservable) {
+    public Diner(Observable<String> clientObservable, Observable<String> autoObservable, Observable<Date> dateObservable) {
         bookkeeping.createPayMap();
         Logger.info("Diner is starting work");
-        kitchen.subscribe(cook);
-        kitchen.subscribe(waiter);
+        kitchen.subscribe(cookController);
+        kitchen.subscribe(waiterController);
         cleanerCaller.subscribe(cleaner);
-        jsonObservable.subscribe(hall);
+        clientObservable.subscribe(hall);
         dateObservable.subscribe(bookkeeper);
-//        jsonObservable.subscribe(driveThru);
-//        driveThru.subscribe(waiter);
+        autoObservable.subscribe(driveThru);
+        driveThru.subscribe(waiterController);
     }
 
     public void dirtCurrentRoom(Room room) {
@@ -132,15 +132,15 @@ public class Diner {
         return bookkeeper;
     }
 
-    public Waiter getWaiter() {
-        return waiter;
+    public WaiterController getWaiterController() {
+        return waiterController;
     }
 
     public Barmen getBarmen() {
         return barmen;
     }
 
-    public Cook getCook() {
-        return cook;
+    public CookController getCookController() {
+        return cookController;
     }
 }

@@ -9,6 +9,7 @@ import org.tinylog.Logger;
 import ru.commandos.Diner;
 import ru.commandos.Humans.Client;
 import ru.commandos.Humans.Waiter;
+import ru.commandos.Humans.WaiterController;
 
 import java.util.ArrayDeque;
 
@@ -31,9 +32,9 @@ public class DriveThru extends Room implements Observer<String> {
         return cars.pollFirst();
     }
 
-    public void subscribe(Waiter waiter) {
-        caller.subscribe(waiter);
-        Logger.info("Waiter is ready to take orders from Drive-Thru");
+    public void subscribe(WaiterController waiterController) {
+        caller.subscribe(waiterController);
+        Logger.info("Waiters is ready to take orders from Drive-Thru");
     }
 
     @Override

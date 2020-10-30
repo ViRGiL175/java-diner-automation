@@ -7,6 +7,7 @@ import ru.commandos.Diner;
 import ru.commandos.Humans.Barmen;
 import ru.commandos.Humans.Client;
 import ru.commandos.Humans.Waiter;
+import ru.commandos.Humans.WaiterController;
 import ru.commandos.Order;
 
 import java.util.*;
@@ -121,8 +122,8 @@ public class Bar extends Room {
     }
 
 
-    public void subscribe(Waiter waiter) {
-        waiterCaller.subscribe(waiter);
+    public void subscribe(WaiterController waiterController) {
+        waiterCaller.subscribe(waiterController);
     }
 
     public void subscribe(Barmen barmen) {

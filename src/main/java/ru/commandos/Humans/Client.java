@@ -92,7 +92,6 @@ public class Client extends Human {
             Logger.warn("Waiter made a mistake with the order :(");
         } else {
             Logger.info("Client got order");
-            order.placed = true;
         }
         currentRoom.getDirty();
 
@@ -108,7 +107,7 @@ public class Client extends Human {
 
     @Override
     public void useToilet() {
-        if (new Random().nextInt(10) < 2) {
+        if (orderPlace != Room.OrderPlace.DRIVETHRU && new Random().nextInt(10) < 2) {
             Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
                 Logger.info(this.getClass().getSimpleName() + " used Toilet");
                 if (currentRoom instanceof Tables) {
