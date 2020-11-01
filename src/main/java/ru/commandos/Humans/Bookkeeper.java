@@ -7,6 +7,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import org.tinylog.Logger;
 import ru.commandos.Diner;
 import ru.commandos.Food.IngredientList;
+import ru.commandos.Main;
 import ru.commandos.Rooms.Bookkeeping;
 
 import java.util.*;
@@ -72,6 +73,7 @@ public class Bookkeeper extends Staff implements Observer<Date> {
 
     @Override
     public void onNext(@NonNull Date date) {
+        Main.updateDate(date);
         if (this.calendar == null) {
             calendar = new GregorianCalendar();
             calendar.setTime(date);
@@ -83,6 +85,7 @@ public class Bookkeeper extends Staff implements Observer<Date> {
                     calendar = calendarToday;
                     payTax();
                     payDay();
+                    bookkeeping.countDinamic();
                 });
             }
         }

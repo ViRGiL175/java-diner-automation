@@ -7,6 +7,7 @@ import ru.commandos.Diner;
 import ru.commandos.Humans.Client;
 import ru.commandos.Humans.Waiter;
 import ru.commandos.Humans.WaiterController;
+import ru.commandos.Main;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -70,6 +71,13 @@ public class Tables extends Room {
         Client client = getClient(table);
         diner.feedback(client);
         tables.set(table, null);
+        if (table < 5 || table == 9) {
+            Main.canteenPlaces.get(table).setText((table + 1) + ".        ");
+        }
+        else {
+            Main.canteenPlaces.get(table).setText(" " + (table + 1) + ".        ");
+        }
+        Main.updateScreen();
         freePlace.add(table);
         Logger.info("Client is gone (feedback: " + client.feedback + "), chair #" + table + " is free");
     }

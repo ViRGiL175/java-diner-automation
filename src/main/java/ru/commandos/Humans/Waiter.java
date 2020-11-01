@@ -87,7 +87,8 @@ public class Waiter extends Staff implements Observer<String> {
                 move(driveThru);
                 driveThru.getCar().setOrder(order);
                 Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(s -> {
-                    changeMoney(driveThru.carGone().pay());
+                    changeMoney(driveThru.getCar().pay());
+                    driveThru.carGone();
                 });
                 Observable.timer(2 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(s -> {
                     givePaymentToBookkeeper();

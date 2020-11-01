@@ -5,6 +5,7 @@ import org.tinylog.Logger;
 import ru.commandos.Diner;
 import ru.commandos.Food.Dish.Dish;
 import ru.commandos.Food.Drink.Drink;
+import ru.commandos.Main;
 import ru.commandos.Menu;
 import ru.commandos.Order;
 import ru.commandos.Rooms.Bar;
@@ -37,11 +38,19 @@ public class Client extends Human {
     public void setTable(Integer table) {
         this.table = table;
         if (orderPlace == Room.OrderPlace.TABLES) {
+            if (table < 5 || table == 9) {
+                Main.canteenPlaces.get(table).setText((table + 1) + ".Client  ");
+            }
+            else {
+                Main.canteenPlaces.get(table).setText(" " + (table + 1) + ".Client  ");
+            }
             Logger.info(this + " sat at the table #" + table);
         }
         else {
+            Main.counterPlaces.get(table).setText((table + 1) + ".Client  ");
             Logger.info(this + " sat at the chair #" + table);
         }
+        Main.updateScreen();
     }
 
     public void setMenu(Menu menu) {

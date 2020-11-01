@@ -5,6 +5,7 @@ import ru.commandos.Diner;
 import ru.commandos.Humans.Cook;
 import ru.commandos.Humans.Staff;
 import ru.commandos.Humans.Waiter;
+import ru.commandos.Main;
 
 import java.util.HashMap;
 
@@ -12,6 +13,8 @@ public class Bookkeeping extends Room {
 
     private final Diner diner;
     private double budget = 1000;
+    private double budgetPerMouth = 0;
+    private Double dinamic = null;
 
     private final HashMap<Staff, Double> pay = new HashMap<>();
 
@@ -21,13 +24,21 @@ public class Bookkeeping extends Room {
 
     public void putMoneyInBudget(Double money) {
         budget += money;
+        budgetPerMouth += money;
+        Main.updateBudget(budget, dinamic);
         Logger.info(String.format("Diner's budget: $%.2f\n", budget));
     }
 
     public Double getMoneyFromBudget(Double money) {
         budget -= money;
+        budgetPerMouth -= money;
+        Main.updateBudget(budget, dinamic);
         Logger.info(String.format("Diner's budget: $%.2f\n", budget));
         return money;
+    }
+
+    public void countDinamic() {
+        dinamic = budgetPerMouth/30;
     }
 
     public Double checkBudget() {

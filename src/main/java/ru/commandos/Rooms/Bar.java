@@ -8,6 +8,7 @@ import ru.commandos.Humans.Barmen;
 import ru.commandos.Humans.Client;
 import ru.commandos.Humans.Waiter;
 import ru.commandos.Humans.WaiterController;
+import ru.commandos.Main;
 import ru.commandos.Order;
 
 import java.util.*;
@@ -30,7 +31,7 @@ public class Bar extends Room {
     private final HashSet<Integer> freePlace = new HashSet<>();
 
     {
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 4; i++) {
             chairs.add(null);
             freePlace.add(i);
         }
@@ -85,6 +86,8 @@ public class Bar extends Room {
         Client client = getClient(chair);
         diner.feedback(client);
         chairs.set(chair, null);
+        Main.counterPlaces.get(chair).setText((chair + 1) + ".        ");
+        Main.updateScreen();
         freePlace.add(chair);
         Logger.info("Client is gone (feedback: " + client.feedback + "), chair #" + chair + " is free");
     }
