@@ -61,7 +61,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
 
-        Diner.slowdown = 100;
+        Diner.slowdown = 1000;
 
         Observable.just(1).subscribeOn(Schedulers.newThread()).subscribe(v -> {
 
