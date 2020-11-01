@@ -334,7 +334,7 @@ public class Main {
         feedbackWindow.setTheme(new SimpleTheme(new TextColor.RGB(188, 111, 95), new TextColor.RGB(223, 196, 104), SGR.BOLD));
     }
 
-    public static void addToCmd(String s1) {
+    public static void addToCmd(String... s1) {
         downWindowRadioBoxList.addItem("                                                                                                                        ");
         GregorianCalendar calendar = new GregorianCalendar();
         String s = calendar.get(Calendar.YEAR) + "-"
@@ -344,7 +344,9 @@ public class Main {
                 + ":" + ((calendar.get(Calendar.MINUTE) > 10) ? calendar.get(Calendar.MINUTE) : "0" + calendar.get(Calendar.MINUTE))
                 + ":" + ((calendar.get(Calendar.SECOND) > 10) ? calendar.get(Calendar.SECOND) : "0" + calendar.get(Calendar.SECOND));
         downWindowRadioBoxList.addItem(s);
-        downWindowRadioBoxList.addItem(s1);
+        for (String str : s1) {
+            downWindowRadioBoxList.addItem(str);
+        }
     }
 
     public static void addToEconomicLabels(String s) {

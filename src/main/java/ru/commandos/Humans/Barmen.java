@@ -39,7 +39,10 @@ public class Barmen extends Staff implements Observer<String> {
             }
             order.doneDrinks.add(drink);
         }
-        Main.addToCmd("DEBUG: Barmen made drinks " + order);
+        Main.addToCmd("DEBUG: Barmen made drinks: Order{",
+                "dishes=" + order.dishes.toString(),
+                "drinks=" + order.drinks.toString(),
+                "table=" + ((order.orderPlace == Room.OrderPlace.DRIVETHRU) ? "D-Thru" : order.table.toString()), "cost=" + String.valueOf(order.cost) + "}");
         Logger.debug("List of remaining ingredients in the Bar: " + bar.checkIngredients());
         Logger.debug("Barmen made drinks " + order);
         Main.barmenPlace.setText("Barmen     ");
@@ -71,7 +74,10 @@ public class Barmen extends Staff implements Observer<String> {
                 bar.clientGone(order.table);
                 isFree = true;
             } else {
-                Main.addToCmd("INFO: Barmen took Order at Counter: " + order);
+                Main.addToCmd("INFO: Barmen took Order at Counter: Order{",
+                        "dishes=" + order.dishes.toString(),
+                        "drinks=" + order.drinks.toString(),
+                        "table=" + order.table.toString(), "cost=" + String.valueOf(order.cost) + "}");
                 Logger.info("Barmen took Order at Bar: " + order);
                 Main.counterPlaces.get(chairNumber).setText((chairNumber + 1) + ".Client(W)");
                 Main.updateScreen();
@@ -193,7 +199,10 @@ public class Barmen extends Staff implements Observer<String> {
                     if (order.orderPlace.equals(Room.OrderPlace.BAR)) {
                         setReadyOrder(order);
                     } else {
-                        Main.addToCmd("DEBUG: Barmen is shaking drinks");
+                        Main.addToCmd("DEBUG: Barmen is shaking drinks: Order{",
+                                "dishes=" + order.dishes.toString(),
+                                "drinks=" + order.drinks.toString(),
+                                "table=" + ((order.orderPlace == Room.OrderPlace.DRIVETHRU) ? "D-Thru" : order.table.toString()), "cost=" + String.valueOf(order.cost) + "}");
                         Logger.debug("Barmen is shaking drinks");
                         Main.barmenPlace.setText("Barmen(C)  ");
                         Main.updateScreen();

@@ -10,6 +10,7 @@ import ru.commandos.Food.Dish.Dish;
 import ru.commandos.Main;
 import ru.commandos.Order;
 import ru.commandos.Rooms.Kitchen;
+import ru.commandos.Rooms.Room;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -42,9 +43,12 @@ public class Cook extends Staff implements Observer<Order> {
         }
         currentRoom.getDirty();
 
-        Main.addToCmd("DEBUG: Cook cooked dishes " + order);
+        Main.addToCmd("DEBUG: Cook cooked dishes: Order{",
+                "dishes=" + order.dishes.toString(),
+                "drinks=" + order.drinks.toString(),
+                "table=" + ((order.orderPlace == Room.OrderPlace.DRIVETHRU) ? "D-Thru" : order.table.toString()), "cost=" + String.valueOf(order.cost) + "}");
         Logger.info("List of remaining ingredients in the Kitchen: " + kitchen.checkIngredients());
-        Logger.debug("Cook " + number + " cooked dishes " + order);
+        Logger.debug("Cook " + number + " cooked dishes" + order);
         Main.cookPlaces.get(number).setText("Cook   ");
         Main.updateScreen();
         kitchen.transferDish(order);
@@ -102,7 +106,10 @@ public class Cook extends Staff implements Observer<Order> {
             if (isFree && action.peekFirst() == actionNumber) {
                 action.pollFirst();
                 isFree = false;
-                Main.addToCmd("DEBUG: Cook is cooking " + order);
+                Main.addToCmd("DEBUG: Cook is cooking: Order{",
+                        "dishes=" + order.dishes.toString(),
+                        "drinks=" + order.drinks.toString(),
+                        "table=" + ((order.orderPlace == Room.OrderPlace.DRIVETHRU) ? "D-Thru" : order.table.toString()), "cost=" + String.valueOf(order.cost) + "}");
                 Logger.debug("Cook " + number + " is cooking " + order);
                 Main.cookPlaces.get(number).setText("Cook(C)");
                 Main.updateScreen();

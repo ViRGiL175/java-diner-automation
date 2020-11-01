@@ -58,9 +58,9 @@ public class Hall implements Observer<String> {
                 bar.setClient(client);
             }
         } else {
-            Main.addToCmd("INFO: " + client + " did't enter, because he haven't money");
+            Main.addToCmd("INFO: " + client + " did't enter, he haven't money");
             Main.updateScreen();
-            Logger.info(client + " did't enter, because he haven't money");
+            Logger.info(client + " did't enter, he haven't money");
         }
     }
 

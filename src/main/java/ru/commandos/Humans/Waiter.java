@@ -52,7 +52,10 @@ public class Waiter extends Staff implements Observer<String> {
                 diner.getHall().getTables().clientGone(order.table);
                 isFree = true;
             } else {
-                Main.addToCmd("INFO: Waiter took Order at Canteen: " + order);
+                Main.addToCmd("INFO: Waiter took Order at Canteen: Order{",
+                        "dishes=" + order.dishes.toString(),
+                        "drinks=" + order.drinks.toString(),
+                        "table=" + order.table.toString(), "cost=" + String.valueOf(order.cost) + "}");
                 Main.updateScreen();
                 Logger.info("Waiter " + number + " took Order at Tables: " + order);
                 if (tableNumber < 5 || tableNumber == 9) {
@@ -80,7 +83,10 @@ public class Waiter extends Staff implements Observer<String> {
                 driveThru.carGone();
                 isFree = true;
             } else {
-                Main.addToCmd("INFO: Waiter took Order at D-Thru: " + order);
+                Main.addToCmd("INFO: Waiter took Order at D-Thru: Order{",
+                        "dishes=" + order.dishes.toString(),
+                        "drinks=" + order.drinks.toString(),
+                        "table=" + ((order.orderPlace == Room.OrderPlace.DRIVETHRU) ? "D-Thru" : order.table.toString()), "cost=" + String.valueOf(order.cost) + "}");
                 Main.updateScreen();
                 Logger.info("Waiter " + number + " took Order at Drive-Thru: " + order);
                 Main.driveThruPlaces.get(0).setText("1.Auto(W) ");
