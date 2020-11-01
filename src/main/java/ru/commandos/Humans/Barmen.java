@@ -7,6 +7,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import org.tinylog.Logger;
 import ru.commandos.Diner;
 import ru.commandos.Food.Drink.Drink;
+import ru.commandos.Main;
 import ru.commandos.Order;
 import ru.commandos.Rooms.Bar;
 import ru.commandos.Rooms.Room;
@@ -39,6 +40,8 @@ public class Barmen extends Staff implements Observer<String> {
         }
         Logger.debug("List of remaining ingredients in the Bar: " + bar.checkIngredients());
         Logger.debug("Barmen made drinks " + order);
+        Main.barmenPlace.setText("Barmen     ");
+        Main.updateScreen();
         currentRoom.getDirty();
 
         if (order.orderPlace != Room.OrderPlace.BAR) {
@@ -54,6 +57,8 @@ public class Barmen extends Staff implements Observer<String> {
     private void acceptOrder(Integer chairNumber) {
         Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
             bar.getClient(chairNumber).setMenu(diner.getMenu());
+            Main.counterPlaces.get(chairNumber).setText((chairNumber + 1) + ".Client(O)");
+            Main.updateScreen();
         });
         Observable.timer(2 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
             Order order = bar.getClient(chairNumber).getOrder();
@@ -63,6 +68,8 @@ public class Barmen extends Staff implements Observer<String> {
                 isFree = true;
             } else {
                 Logger.info("Barmen took Order at Bar: " + order);
+                Main.counterPlaces.get(chairNumber).setText((chairNumber + 1) + ".Client(W)");
+                Main.updateScreen();
                 transferOrder(order);
             }
         });
@@ -75,8 +82,11 @@ public class Barmen extends Staff implements Observer<String> {
                 bar.transfer(order);
             }
             Logger.debug("Barmen is shaking drinks");
+            Main.barmenPlace.setText("Barmen(C)  ");
+            Main.updateScreen();
             Observable.timer(5 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> shake(order));
         } else {
+            Logger.debug("Barmen transferred Order to the Kitchen");
             bar.transfer(order);
             isFree = true;
         }
@@ -87,6 +97,8 @@ public class Barmen extends Staff implements Observer<String> {
         Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
             Logger.debug("Barmen gives the order to Client " + order);
             client.setOrder(order);
+            Main.counterPlaces.get(order.table).setText((order.table + 1) + ".Client   ");
+            Main.updateScreen();
         });
         Observable.timer(2 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
             changeMoney(client.pay());
@@ -151,6 +163,8 @@ public class Barmen extends Staff implements Observer<String> {
                         setReadyOrder(order);
                     } else {
                         Logger.debug("Barmen is shaking drinks");
+                        Main.barmenPlace.setText("Barmen(C)  ");
+                        Main.updateScreen();
                         Observable.timer(5 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> shake(order));
                     }
                 } else {

@@ -23,7 +23,7 @@ public class CookController implements Observer<Order> {
     public CookController(Diner diner) {
         this.diner = diner;
         for (int i = 0; i < 2; i++) {
-            cooks.add(new Cook(diner, diner.getKitchen(), i + 1));
+            cooks.add(new Cook(diner, diner.getKitchen(), i));
             cookCaller.put(i, PublishSubject.create());
             cookCaller.get(i).subscribe(cooks.get(i));
         }

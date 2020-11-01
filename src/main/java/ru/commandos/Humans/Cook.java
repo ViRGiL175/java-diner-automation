@@ -7,6 +7,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import org.tinylog.Logger;
 import ru.commandos.Diner;
 import ru.commandos.Food.Dish.Dish;
+import ru.commandos.Main;
 import ru.commandos.Order;
 import ru.commandos.Rooms.Kitchen;
 
@@ -23,7 +24,7 @@ public class Cook extends Staff implements Observer<Order> {
     private long actionCount;
     private final Deque<Long> action = new ArrayDeque<>();
 
-    private int number;
+    private final int number;
 
     public Cook(Diner diner, Kitchen kitchen, int number) {
         super(diner);
@@ -43,6 +44,8 @@ public class Cook extends Staff implements Observer<Order> {
 
         Logger.info("List of remaining ingredients in the Kitchen: " + kitchen.checkIngredients());
         Logger.debug("Cook " + number + " cooked dishes " + order);
+        Main.cookPlaces.get(number).setText("Cook   ");
+        Main.updateScreen();
         kitchen.transferDish(order);
 
         useToilet();
@@ -82,6 +85,8 @@ public class Cook extends Staff implements Observer<Order> {
                 action.pollFirst();
                 isFree = false;
                 Logger.debug("Cook " + number + " is cooking " + order);
+                Main.cookPlaces.get(number).setText("Cook(C)");
+                Main.updateScreen();
                 Observable.timer(5 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> cook(order));
             }
         });

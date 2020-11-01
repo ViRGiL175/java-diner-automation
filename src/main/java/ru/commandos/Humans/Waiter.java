@@ -6,6 +6,7 @@ import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import org.tinylog.Logger;
 import ru.commandos.Diner;
+import ru.commandos.Main;
 import ru.commandos.Order;
 import ru.commandos.Rooms.*;
 
@@ -33,6 +34,12 @@ public class Waiter extends Staff implements Observer<String> {
     }
 
     public void acceptTablesOrder(Integer tableNumber) {
+        if (tableNumber < 5 || tableNumber == 9) {
+            Main.canteenPlaces.get(tableNumber).setText((tableNumber + 1) + ".Client(O)");
+        } else {
+            Main.canteenPlaces.get(tableNumber).setText(" " + (tableNumber + 1) + ".Client(O)");
+        }
+        Main.updateScreen();
         Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
             move(diner.getHall().getTables());
             diner.getHall().getTables().getClient(tableNumber).setMenu(diner.getMenu());
@@ -43,12 +50,20 @@ public class Waiter extends Staff implements Observer<String> {
                 isFree = true;
             } else {
                 Logger.info("Waiter " + number + " took Order at Tables: " + order);
+                if (tableNumber < 5 || tableNumber == 9) {
+                    Main.canteenPlaces.get(tableNumber).setText((tableNumber + 1) + ".Client(W)");
+                } else {
+                    Main.canteenPlaces.get(tableNumber).setText(" " + (tableNumber + 1) + ".Client(W)");
+                }
+                Main.updateScreen();
                 transferOrder(order);
             }
         });
     }
 
     public void acceptDriveThruOrder() {
+        Main.driveThruPlaces.get(0).setText("1.Auto(O) ");
+        Main.updateScreen();
         Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
             move(diner.getDriveThru());
             driveThru.getCar().setMenu(diner.getMenu());
@@ -59,6 +74,8 @@ public class Waiter extends Staff implements Observer<String> {
                 isFree = true;
             } else {
                 Logger.info("Waiter " + number + " took Order at Drive-Thru: " + order);
+                Main.driveThruPlaces.get(0).setText("1.Auto(W) ");
+                Main.updateScreen();
                 transferOrder(order);
             }
         });
@@ -97,6 +114,12 @@ public class Waiter extends Staff implements Observer<String> {
                 move(diner.getHall().getTables());
                 Client client = diner.getHall().getTables().getClient(order.table);
                 client.setOrder(order);
+                if (order.table < 5 || order.table == 9) {
+                    Main.canteenPlaces.get(order.table).setText((order.table + 1) + ".Client   ");
+                } else {
+                    Main.canteenPlaces.get(order.table).setText(" " + (order.table + 1) + ".Client   ");
+                }
+                Main.updateScreen();
                 Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(s -> {
                     changeMoney(client.pay());
                     if ((client.getMoney() < diner.getMenu().food.values().stream().min(Double::compare).get()

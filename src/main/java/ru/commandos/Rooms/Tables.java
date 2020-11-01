@@ -72,10 +72,10 @@ public class Tables extends Room {
         diner.feedback(client);
         tables.set(table, null);
         if (table < 5 || table == 9) {
-            Main.canteenPlaces.get(table).setText((table + 1) + ".        ");
+            Main.canteenPlaces.get(table).setText((table + 1) + ".         ");
         }
         else {
-            Main.canteenPlaces.get(table).setText(" " + (table + 1) + ".        ");
+            Main.canteenPlaces.get(table).setText(" " + (table + 1) + ".         ");
         }
         Main.updateScreen();
         freePlace.add(table);

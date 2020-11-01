@@ -39,15 +39,15 @@ public class Client extends Human {
         this.table = table;
         if (orderPlace == Room.OrderPlace.TABLES) {
             if (table < 5 || table == 9) {
-                Main.canteenPlaces.get(table).setText((table + 1) + ".Client  ");
+                Main.canteenPlaces.get(table).setText((table + 1) + ".Client   ");
             }
             else {
-                Main.canteenPlaces.get(table).setText(" " + (table + 1) + ".Client  ");
+                Main.canteenPlaces.get(table).setText(" " + (table + 1) + ".Client   ");
             }
             Logger.info(this + " sat at the table #" + table);
         }
         else {
-            Main.counterPlaces.get(table).setText((table + 1) + ".Client  ");
+            Main.counterPlaces.get(table).setText((table + 1) + ".Client   ");
             Logger.info(this + " sat at the chair #" + table);
         }
         Main.updateScreen();
