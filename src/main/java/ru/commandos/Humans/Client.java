@@ -44,9 +44,11 @@ public class Client extends Human {
             } else {
                 Main.canteenPlaces.get(table).setText(" " + (table + 1) + ".Client   ");
             }
+            Main.addToCmd("INFO: " + this + " sat at the table #" + table);
             Logger.info(this + " sat at the table #" + table);
         } else {
             Main.counterPlaces.get(table).setText((table + 1) + ".Client   ");
+            Main.addToCmd("INFO: " + this + " sat at the chair #" + table);
             Logger.info(this + " sat at the chair #" + table);
         }
         Main.updateScreen();
@@ -54,6 +56,7 @@ public class Client extends Human {
 
     public void setMenu(Menu menu) {
         this.menu = menu;
+        Main.addToCmd("INFO: " + this + " got a menu");
         Logger.info(this + " got a menu");
     }
 
@@ -99,6 +102,7 @@ public class Client extends Human {
         if (!this.order.equals(order)) {
             Logger.warn("Waiter made a mistake with the order :(");
         } else {
+            Main.addToCmd("INFO: " + this + " got order");
             Logger.info("Client got order");
         }
         currentRoom.getDirty();
@@ -109,6 +113,7 @@ public class Client extends Human {
 
     public Double pay() {
         changeMoney(-order.cost);
+        Main.addToCmd("INFO: " + this + " paid for order");
         Logger.info("Client paid for order");
         return order.cost;
     }
@@ -134,13 +139,13 @@ public class Client extends Human {
                         } else {
                             Main.canteenPlaces.get(table).setText(" " + (table + 1) + ".         ");
                         }
-                    }
-                    else {
+                    } else {
                         Main.counterPlaces.get(table).setText((table + 1) + ".        ");
                     }
                     Main.restRoomPlaces.get(place).setText((place + 1) + ".Client   ");
                     Main.updateScreen();
                     Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
+                        Main.addToCmd(this + " used Restroom");
                         Logger.info(this.getClass().getSimpleName() + " used Toilet");
                         queue.remove(this);
                         Main.restRoomPlaces.get(place).setText((place + 1) + ".        ");
@@ -150,20 +155,16 @@ public class Client extends Human {
                             } else {
                                 Main.canteenPlaces.get(table).setText(" " + (table + 1) + ".Client   ");
                             }
-                        }
-                        else {
+                        } else {
                             Main.counterPlaces.get(table).setText((table + 1) + ".Client   ");
+                        }
+                        if (currentRoom instanceof Tables) {
+                            ((Tables) currentRoom).getToilet().getDirty();
+                        } else if (currentRoom instanceof Bar) {
+                            ((Bar) currentRoom).getToilet().getDirty();
                         }
                         Main.updateScreen();
                     });
-                }
-            });
-            Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
-                Logger.info(this.getClass().getSimpleName() + " used Toilet");
-                if (currentRoom instanceof Tables) {
-                    ((Tables) currentRoom).getToilet().getDirty();
-                } else if (currentRoom instanceof Bar) {
-                    ((Bar) currentRoom).getToilet().getDirty();
                 }
             });
         }
@@ -172,11 +173,7 @@ public class Client extends Human {
     @Override
     public String toString() {
         return "Client{" +
-                "table=" + table +
-                ", menu=" + menu +
-                ", uuid='" + uuid + '\'' +
-                ", order=" + order +
-                ", money='" + money + '\'' +
+                "uuid='" + new StringBuilder(uuid).delete(18, 36) +
                 '}';
     }
 }

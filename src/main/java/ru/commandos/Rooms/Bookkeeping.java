@@ -26,6 +26,8 @@ public class Bookkeeping extends Room {
         budget += money;
         budgetPerMouth += money;
         Main.updateBudget(budget, dinamic);
+        Main.addToCmd(String.format("INFO: Diner's budget: $%.2f\n", budget));
+        Main.updateScreen();
         Logger.info(String.format("Diner's budget: $%.2f\n", budget));
     }
 
@@ -33,6 +35,8 @@ public class Bookkeeping extends Room {
         budget -= money;
         budgetPerMouth -= money;
         Main.updateBudget(budget, dinamic);
+        Main.addToCmd(String.format("INFO: Diner's budget: $%.2f\n", budget));
+        Main.updateScreen();
         Logger.info(String.format("Diner's budget: $%.2f\n", budget));
         return money;
     }
@@ -62,7 +66,7 @@ public class Bookkeeping extends Room {
 
     @Override
     public boolean hasFreePlace() {
-        return false;
+        return true;
     }
 
     @Override

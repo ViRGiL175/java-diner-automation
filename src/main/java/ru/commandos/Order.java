@@ -34,11 +34,7 @@ public class Order {
         return "Order{" +
                 "food=" + dishes +
                 ", drinks=" + drinks +
-                ", doneFood=" + doneDishes +
-                ", doneDrinks=" + doneDrinks +
-                ((orderPlace == Room.OrderPlace.DRIVETHRU)
-                        ? (", orderPlace=" + orderPlace.name())
-                        : (", orderPlace=" + orderPlace.name() + ", table=" + table)) +
+                ", table=" + table +
                 ", cost=" + String.format("$%.2f", cost) +
                 '}';
     }

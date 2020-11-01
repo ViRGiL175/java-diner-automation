@@ -43,6 +43,7 @@ public class Cleaner extends Staff implements Observer<Room> {
                     Main.updateScreen();
                     Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
                         Logger.info(this.getClass().getSimpleName() + " used Toilet");
+                        Main.addToCmd("INFO: Cleaner used Restroom");
                         queue.remove(this);
                         Main.restRoomPlaces.get(place).setText((place + 1) + ".        ");
                         Main.kitchenPlaces.get(2).setText("Cleaner");
@@ -61,6 +62,7 @@ public class Cleaner extends Staff implements Observer<Room> {
 
     @Override
     public void onSubscribe(@NonNull Disposable d) {
+        Main.addToCmd("INFO: Cleaner is ready to work");
         Logger.info("Cleaner is ready to work");
     }
 
@@ -106,7 +108,7 @@ public class Cleaner extends Staff implements Observer<Room> {
                     } else {
                         label.setText("4.        ");
                     }
-
+                    Main.updateScreen();
                     useToilet();
                 });
             }

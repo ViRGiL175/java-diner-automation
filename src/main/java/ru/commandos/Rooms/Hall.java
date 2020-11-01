@@ -39,6 +39,7 @@ public class Hall implements Observer<String> {
 
     @Override
     public void onSubscribe(@NonNull Disposable d) {
+        Main.addToCmd("INFO: Hall is open");
         Logger.info("Hall is open");
         bar.subscribe(diner.getBarmen());
         bar.subscribe(diner.getWaiterController());
@@ -57,6 +58,8 @@ public class Hall implements Observer<String> {
                 bar.setClient(client);
             }
         } else {
+            Main.addToCmd("INFO: " + client + " did't enter, because he haven't money");
+            Main.updateScreen();
             Logger.info(client + " did't enter, because he haven't money");
         }
     }

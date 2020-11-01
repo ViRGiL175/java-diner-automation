@@ -7,6 +7,7 @@ import ru.commandos.Humans.Cook;
 import ru.commandos.Humans.CookController;
 import ru.commandos.Humans.Waiter;
 import ru.commandos.Humans.WaiterController;
+import ru.commandos.Main;
 import ru.commandos.Order;
 
 import java.util.ArrayDeque;
@@ -39,6 +40,7 @@ public class Kitchen extends Room {
 
     public void subscribe(CookController cookController) {
         dashboard.subscribe(cookController);
+        Main.addToCmd("INFO: Cooks is ready to work");
         Logger.info("Cooks is ready to work");
     }
 

@@ -42,6 +42,7 @@ public class Cook extends Staff implements Observer<Order> {
         }
         currentRoom.getDirty();
 
+        Main.addToCmd("DEBUG: Cook cooked dishes " + order);
         Logger.info("List of remaining ingredients in the Kitchen: " + kitchen.checkIngredients());
         Logger.debug("Cook " + number + " cooked dishes " + order);
         Main.cookPlaces.get(number).setText("Cook   ");
@@ -69,6 +70,7 @@ public class Cook extends Staff implements Observer<Order> {
                     Main.restRoomPlaces.get(place).setText((place + 1) + ".Cook    ");
                     Main.updateScreen();
                     Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
+                        Main.addToCmd("INFO: Cook used Restroom");
                         Logger.info(this.getClass().getSimpleName() + " used Toilet");
                         queue.remove(this);
                         Main.restRoomPlaces.get(place).setText((place + 1) + ".        ");
@@ -100,6 +102,7 @@ public class Cook extends Staff implements Observer<Order> {
             if (isFree && action.peekFirst() == actionNumber) {
                 action.pollFirst();
                 isFree = false;
+                Main.addToCmd("DEBUG: Cook is cooking " + order);
                 Logger.debug("Cook " + number + " is cooking " + order);
                 Main.cookPlaces.get(number).setText("Cook(C)");
                 Main.updateScreen();

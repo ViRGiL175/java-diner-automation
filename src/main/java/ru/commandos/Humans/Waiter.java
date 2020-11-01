@@ -46,10 +46,14 @@ public class Waiter extends Staff implements Observer<String> {
             diner.getHall().getTables().getClient(tableNumber).setMenu(diner.getMenu());
             order = diner.getHall().getTables().getClient(tableNumber).getOrder();
             if (order.cost == 0.) {
+                Main.addToCmd("INFO: Client hasn't ordered");
+                Main.updateScreen();
                 Logger.info("Client hasn't ordered");
                 diner.getHall().getTables().clientGone(order.table);
                 isFree = true;
             } else {
+                Main.addToCmd("INFO: Waiter took Order at Canteen: " + order);
+                Main.updateScreen();
                 Logger.info("Waiter " + number + " took Order at Tables: " + order);
                 if (tableNumber < 5 || tableNumber == 9) {
                     Main.canteenPlaces.get(tableNumber).setText((tableNumber + 1) + ".Client(W)");
@@ -70,10 +74,14 @@ public class Waiter extends Staff implements Observer<String> {
             driveThru.getCar().setMenu(diner.getMenu());
             order = driveThru.getCar().getOrder();
             if (order.cost == 0.) {
+                Main.addToCmd("INFO: Client hasn't ordered");
+                Main.updateScreen();
                 Logger.info("Client hasn't ordered");
                 driveThru.carGone();
                 isFree = true;
             } else {
+                Main.addToCmd("INFO: Waiter took Order at D-Thru: " + order);
+                Main.updateScreen();
                 Logger.info("Waiter " + number + " took Order at Drive-Thru: " + order);
                 Main.driveThruPlaces.get(0).setText("1.Auto(W) ");
                 Main.updateScreen();
@@ -202,6 +210,7 @@ public class Waiter extends Staff implements Observer<String> {
                     Main.restRoomPlaces.get(place).setText((place + 1) + ".Waiter  ");
                     Main.updateScreen();
                     Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
+                        Main.addToCmd("INFO: Waiter used Restroom");
                         Logger.info(this.getClass().getSimpleName() + " used Toilet");
                         queue.remove(this);
                         Main.restRoomPlaces.get(place).setText((place + 1) + ".        ");

@@ -35,14 +35,17 @@ public class DriveThru extends Room implements Observer<String> {
         for (int i = 0; i < Main.driveThruPlaces.size(); i++) {
             if (i >= cars.size()) {
                 Main.driveThruPlaces.get(i).setText((i + 1) + ".        ");
+                Main.updateScreen();
             }
         }
+        Main.addToCmd("INFO: Auto is gone");
         Main.updateScreen();
         Logger.info("Auto is gone");
     }
 
     public void subscribe(WaiterController waiterController) {
         caller.subscribe(waiterController);
+        Main.addToCmd("INFO: Waiters is ready to take orders from Drive-Thru");
         Logger.info("Waiters is ready to take orders from Drive-Thru");
     }
 
@@ -58,7 +61,8 @@ public class DriveThru extends Room implements Observer<String> {
 
     @Override
     public void onSubscribe(@NonNull Disposable d) {
-        System.out.println("Drive-Thru is open");
+        Main.addToCmd("INFO: Drive-Thru is open");
+        Logger.info("Drive-Thru is open");
     }
 
     @Override
@@ -73,6 +77,8 @@ public class DriveThru extends Room implements Observer<String> {
             Main.updateScreen();
             caller.onNext(DriveThru.class.getSimpleName());
         } else {
+            Main.addToCmd("INFO: No places in Drive-Thru");
+            Main.updateScreen();
             Logger.info("No places!");
         }
     }

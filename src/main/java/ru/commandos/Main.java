@@ -61,7 +61,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
 
-        Diner.slowdown = 300;
+        Diner.slowdown = 100;
 
         Observable.just(1).subscribeOn(Schedulers.newThread()).subscribe(v -> {
 
@@ -166,6 +166,14 @@ public class Main {
         }
     }
 
+    private static void switching() {
+        if (multiWindowTextGUI.getActiveWindow() == upWindow) {
+            multiWindowTextGUI.setActiveWindow(downWindow);
+        } else {
+            multiWindowTextGUI.setActiveWindow(upWindow);
+        }
+    }
+
     private static void loadConfig() throws IOException {
 
         terminal = new DefaultTerminalFactory().setInitialTerminalSize(new TerminalSize(80, 24)).createTerminal();
@@ -184,12 +192,13 @@ public class Main {
 
         Panel buttonPanel = new Panel().addTo(mainPanel);
         buttonPanel.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+        buttonPanel.addComponent(new Button("Down", Main::switching));
         economics = new Button("Economics", Main::onPressEconomics);
         buttonPanel.addComponent(economics);
         buttonPanel.addComponent(new EmptySpace(new TerminalSize(1, 1)));
         feedback = new Button("Feedback", Main::onPressFeedback);
         buttonPanel.addComponent(feedback);
-        buttonPanel.addComponent(new EmptySpace(new TerminalSize(27, 1)));
+        buttonPanel.addComponent(new EmptySpace(new TerminalSize(18, 1)));
         budget = new Label("Budget: $1000");
         buttonPanel.addComponent(budget);
 
@@ -273,8 +282,12 @@ public class Main {
 
         cmd = new Panel();
         cmd.setLayoutManager(new LinearLayout(Direction.VERTICAL));
+        Panel cmdHeader = new Panel().addTo(cmd);
+        cmdHeader.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+        cmdHeader.addComponent(new Button("Up", Main::switching));
+        cmdHeader.addComponent(new EmptySpace(new TerminalSize(18, 1)));
+        cmdHeader.addComponent(new Label("Diner Advanced Logging"));
         cmd.addComponent(downWindowRadioBoxList);
-        downWindowRadioBoxList.addItem("Diner Advanced Logging:");
 
         downWindow = new BasicWindow();
         downWindow.setPosition(new TerminalPosition(0, terminal.getTerminalSize().getRows() / 2 + 1));
@@ -321,10 +334,17 @@ public class Main {
         feedbackWindow.setTheme(new SimpleTheme(new TextColor.RGB(188, 111, 95), new TextColor.RGB(223, 196, 104), SGR.BOLD));
     }
 
-    public static void addToCmd(String s1, String s2) {
+    public static void addToCmd(String s1) {
         downWindowRadioBoxList.addItem("                                                                                                                        ");
+        GregorianCalendar calendar = new GregorianCalendar();
+        String s = calendar.get(Calendar.YEAR) + "-"
+                + ((calendar.get(Calendar.MONTH) > 10) ? calendar.get(Calendar.MONTH) : "0" + calendar.get(Calendar.MONTH))
+                + "-" + ((calendar.get(Calendar.DAY_OF_MONTH) > 10) ? calendar.get(Calendar.DAY_OF_MONTH) : "0" + calendar.get(Calendar.DAY_OF_MONTH))
+                + ((calendar.get(Calendar.HOUR_OF_DAY) > 10) ? calendar.get(Calendar.HOUR_OF_DAY) : "0" + calendar.get(Calendar.HOUR_OF_DAY))
+                + ":" + ((calendar.get(Calendar.MINUTE) > 10) ? calendar.get(Calendar.MINUTE) : "0" + calendar.get(Calendar.MINUTE))
+                + ":" + ((calendar.get(Calendar.SECOND) > 10) ? calendar.get(Calendar.SECOND) : "0" + calendar.get(Calendar.SECOND));
+        downWindowRadioBoxList.addItem(s);
         downWindowRadioBoxList.addItem(s1);
-        downWindowRadioBoxList.addItem(s2);
     }
 
     public static void addToEconomicLabels(String s) {

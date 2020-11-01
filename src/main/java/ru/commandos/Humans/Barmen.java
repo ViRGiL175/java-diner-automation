@@ -39,6 +39,7 @@ public class Barmen extends Staff implements Observer<String> {
             }
             order.doneDrinks.add(drink);
         }
+        Main.addToCmd("DEBUG: Barmen made drinks " + order);
         Logger.debug("List of remaining ingredients in the Bar: " + bar.checkIngredients());
         Logger.debug("Barmen made drinks " + order);
         Main.barmenPlace.setText("Barmen     ");
@@ -64,10 +65,13 @@ public class Barmen extends Staff implements Observer<String> {
         Observable.timer(2 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
             Order order = bar.getClient(chairNumber).getOrder();
             if (order.cost == 0.) {
+                Main.addToCmd("INFO: Client hasn't ordered");
+                Main.updateScreen();
                 Logger.info("Client hasn't ordered");
                 bar.clientGone(order.table);
                 isFree = true;
             } else {
+                Main.addToCmd("INFO: Barmen took Order at Counter: " + order);
                 Logger.info("Barmen took Order at Bar: " + order);
                 Main.counterPlaces.get(chairNumber).setText((chairNumber + 1) + ".Client(W)");
                 Main.updateScreen();
@@ -79,14 +83,19 @@ public class Barmen extends Staff implements Observer<String> {
     private void transferOrder(Order order) {
         if (!order.drinks.isEmpty()) {
             if (!order.dishes.isEmpty()) {
+                Main.addToCmd("DEBUG: Barmen transferred Order to the Kitchen");
+                Main.updateScreen();
                 Logger.debug("Barmen transferred Order to the Kitchen");
                 bar.transfer(order);
             }
+            Main.addToCmd("DEBUG: Barmen is shaking drinks");
             Logger.debug("Barmen is shaking drinks");
             Main.barmenPlace.setText("Barmen(C)  ");
             Main.updateScreen();
             Observable.timer(5 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> shake(order));
         } else {
+            Main.addToCmd("DEBUG: Barmen transferred Order to the Kitchen");
+            Main.updateScreen();
             Logger.debug("Barmen transferred Order to the Kitchen");
             bar.transfer(order);
             isFree = true;
@@ -138,6 +147,7 @@ public class Barmen extends Staff implements Observer<String> {
                     Main.restRoomPlaces.get(place).setText((place + 1) + ".Barmen  ");
                     Main.updateScreen();
                     Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
+                        Main.addToCmd("INFO: Barmen used Restroom");
                         Logger.info(this.getClass().getSimpleName() + " used Toilet");
                         queue.remove(this);
                         Main.restRoomPlaces.get(place).setText((place + 1) + ".        ");
@@ -156,6 +166,7 @@ public class Barmen extends Staff implements Observer<String> {
 
     @Override
     public void onSubscribe(@NonNull Disposable d) {
+        Main.addToCmd("INFO: Barmen is ready to work");
         Logger.info("Barmen is ready to work");
     }
 
@@ -182,6 +193,7 @@ public class Barmen extends Staff implements Observer<String> {
                     if (order.orderPlace.equals(Room.OrderPlace.BAR)) {
                         setReadyOrder(order);
                     } else {
+                        Main.addToCmd("DEBUG: Barmen is shaking drinks");
                         Logger.debug("Barmen is shaking drinks");
                         Main.barmenPlace.setText("Barmen(C)  ");
                         Main.updateScreen();

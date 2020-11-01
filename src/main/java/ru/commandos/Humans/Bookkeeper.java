@@ -22,6 +22,7 @@ public class Bookkeeper extends Staff implements Observer<Date> {
         super(diner);
         this.bookkeeping = bookkeeping;
         currentRoom = bookkeeping;
+        Main.addToCmd("INFO: Bookkeeper is ready to work");
         Logger.info("Bookkeeper is ready to work");
     }
 
@@ -33,31 +34,40 @@ public class Bookkeeper extends Staff implements Observer<Date> {
         Double tax = BD * FP * K1 * K2 * 15.0 / 100.0;
         if (tax <= bookkeeping.checkBudget()) {
             bookkeeping.getMoneyFromBudget(tax);
-            Main.addToEconomicLabels((Main.calendar.get(Calendar.YEAR) - 57) + ", " + Main.calendar.get(Calendar.DAY_OF_MONTH) + " " + Main.calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("en")) + ", " + Main.calendar.get(Calendar.HOUR_OF_DAY) + ":" + Main.calendar.get(Calendar.MINUTE) + ":" + " Tax = -$" + String.format("%.2f", tax));
+            Main.addToEconomicLabels((Main.calendar.get(Calendar.YEAR) - 57) + ", " + Main.calendar.get(Calendar.DAY_OF_MONTH) + " " + Main.calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("en")) + ", " + ((Main.calendar.get(Calendar.HOUR_OF_DAY) > 10) ? Main.calendar.get(Calendar.HOUR_OF_DAY) : "0" + Main.calendar.get(Calendar.HOUR_OF_DAY)) + ":" + ((Main.calendar.get(Calendar.MINUTE) > 10) ? Main.calendar.get(Calendar.MINUTE) : "0" + Main.calendar.get(Calendar.MINUTE)) + ":" + " Tax = -$" + String.format("%.2f", tax));
+            Main.addToCmd("INFO: Taxes paid");
+            Main.updateScreen();
             Logger.info("Taxes paid");
         } else {
+            Main.addToCmd("WARN: Taxes not paid due to lack of money");
+            Main.updateScreen();
             Logger.warn("Taxes not paid due to lack of money");
         }
     }
 
     private void payDay() {
+        Main.addToCmd("INFO: Payday!");
         Logger.info("Payday!");
         HashMap<Staff, Double> pay = bookkeeping.getStaffPayList();
         for (Staff staff : pay.keySet()) {
             if (pay.get(staff) <= bookkeeping.checkBudget()) {
                 Double money = bookkeeping.getMoneyFromBudget(pay.get(staff));
-                Main.addToEconomicLabels((Main.calendar.get(Calendar.YEAR) - 57) + ", " + Main.calendar.get(Calendar.DAY_OF_MONTH) + " " + Main.calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("en")) + ", " + Main.calendar.get(Calendar.HOUR_OF_DAY) + ":" + Main.calendar.get(Calendar.MINUTE) + ":" + staff.getClass().getSimpleName() + " receive a salary = -$" + String.format("%.2f", money));
+                Main.addToEconomicLabels((Main.calendar.get(Calendar.YEAR) - 57) + ", " + Main.calendar.get(Calendar.DAY_OF_MONTH) + " " + Main.calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("en")) + ", " + ((Main.calendar.get(Calendar.HOUR_OF_DAY) > 10) ? Main.calendar.get(Calendar.HOUR_OF_DAY) : "0" + Main.calendar.get(Calendar.HOUR_OF_DAY)) + ":" + ((Main.calendar.get(Calendar.MINUTE) > 10) ? Main.calendar.get(Calendar.MINUTE) : "0" + Main.calendar.get(Calendar.MINUTE)) + ":" + staff.getClass().getSimpleName() + " receive a salary = -$" + String.format("%.2f", money));
                 staff.changeMoney(money);
+                Main.addToCmd("DEBUG: " + staff.getClass().getSimpleName() + " receive a salary");
+                Main.updateScreen();
                 Logger.debug(staff.getClass().getSimpleName() + " receive a salary");
             } else {
-                Main.addToEconomicLabels((Main.calendar.get(Calendar.YEAR) - 57) + ", " + Main.calendar.get(Calendar.DAY_OF_MONTH) + " " + Main.calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("en")) + ", " + Main.calendar.get(Calendar.HOUR_OF_DAY) + ":" + Main.calendar.get(Calendar.MINUTE) + ":" + staff.getClass().getSimpleName() + " didn't receive a salary");
+                Main.addToEconomicLabels((Main.calendar.get(Calendar.YEAR) - 57) + ", " + Main.calendar.get(Calendar.DAY_OF_MONTH) + " " + Main.calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("en")) + ", " + ((Main.calendar.get(Calendar.HOUR_OF_DAY) > 10) ? Main.calendar.get(Calendar.HOUR_OF_DAY) : "0" + Main.calendar.get(Calendar.HOUR_OF_DAY)) + ":" + ((Main.calendar.get(Calendar.MINUTE) > 10) ? Main.calendar.get(Calendar.MINUTE) : "0" + Main.calendar.get(Calendar.MINUTE)) + ":" + staff.getClass().getSimpleName() + " didn't receive a salary");
+                Main.addToCmd("WARN: " + staff.getClass().getSimpleName() + " didn't receive a salary");
+                Main.updateScreen();
                 Logger.warn(staff.getClass().getSimpleName() + " didn't receive a salary");
             }
         }
     }
 
     public void giveClientPayment(Double payment) {
-        Main.addToEconomicLabels((Main.calendar.get(Calendar.YEAR) - 57) + ", " + Main.calendar.get(Calendar.DAY_OF_MONTH) + " " + Main.calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("en")) + ", " + Main.calendar.get(Calendar.HOUR_OF_DAY) + ":" + Main.calendar.get(Calendar.MINUTE) + ": Serve a client = +$" + String.format("%.2f", payment));
+        Main.addToEconomicLabels((Main.calendar.get(Calendar.YEAR) - 57) + ", " + Main.calendar.get(Calendar.DAY_OF_MONTH) + " " + Main.calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("en")) + ", " + ((Main.calendar.get(Calendar.HOUR_OF_DAY) > 10) ? Main.calendar.get(Calendar.HOUR_OF_DAY) : "0" + Main.calendar.get(Calendar.HOUR_OF_DAY)) + ":" + ((Main.calendar.get(Calendar.MINUTE) > 10) ? Main.calendar.get(Calendar.MINUTE) : "0" + Main.calendar.get(Calendar.MINUTE)) + ": Serve a client = +$" + String.format("%.2f", payment));
         bookkeeping.putMoneyInBudget(payment);
     }
 
@@ -74,6 +84,7 @@ public class Bookkeeper extends Staff implements Observer<Date> {
                     Main.restRoomPlaces.get(place).setText((place + 1) + ".Bookkeeper");
                     Main.updateScreen();
                     Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
+                        Main.addToCmd("INFO: Bookkeepet used Restroom");
                         Logger.info(this.getClass().getSimpleName() + " used Toilet");
                         queue.remove(this);
                         Main.restRoomPlaces.get(place).setText((place + 1) + ".        ");
@@ -114,6 +125,8 @@ public class Bookkeeper extends Staff implements Observer<Date> {
                 Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
                     Integer countIngredientToBuy = 10 - finalIngredients.get(ingredient);
                     Double money = bookkeeping.getMoneyFromBudget(countIngredientToBuy * IngredientList.getIngredientCost(ingredient));
+                    Main.addToCmd("INFO: Bookkeeper bought an ingredient: " + ingredient + "X" + countIngredientToBuy);
+                    Main.updateScreen();
                     Logger.info("Bookkeeper bought an ingredient: " + ingredient + "X" + countIngredientToBuy);
                     diner.getKitchen().setIngredients(ingredient, countIngredientToBuy);
                 });
@@ -126,6 +139,8 @@ public class Bookkeeper extends Staff implements Observer<Date> {
                 Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
                     Integer countIngredientToBuy = 10 - finalIngredients1.get(ingredient);
                     Double money = bookkeeping.getMoneyFromBudget(countIngredientToBuy * IngredientList.getIngredientCost(ingredient));
+                    Main.addToCmd("INFO: Bookkeeper bought an ingredient: " + ingredient + "X" + countIngredientToBuy);
+                    Main.updateScreen();
                     Logger.info("Bookkeeper bought an ingredient: " + ingredient + "X" + countIngredientToBuy);
                     diner.getHall().getBar().setIngredients(ingredient, countIngredientToBuy);
                 });

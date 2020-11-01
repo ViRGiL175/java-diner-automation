@@ -35,6 +35,7 @@ public class Tables extends Room {
 
     public void subscribe(WaiterController waiterController) {
         waiterCaller.subscribe(waiterController);
+        Main.addToCmd("INFO: Waiters is ready to work");
         Logger.info("Waiters is ready to work");
     }
 
@@ -52,16 +53,22 @@ public class Tables extends Room {
             tables.set(table, client);
             freePlace.remove(table);
             Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
+                Main.addToCmd("INFO: " + client + " ready to do order!");
+                Main.updateScreen();
                 Logger.info(client + " ready to do order!");
                 waiterCaller.onNext(Tables.class.getSimpleName() + table);
             });
         } else {
+            Main.addToCmd("No place in Canteen!");
+            Main.updateScreen();
             Logger.warn("No place!");
         }
     }
 
     public void reOrder(Integer table) {
         Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
+            Main.addToCmd("INFO: " + getClient(table) + " ready to do order again!");
+            Main.updateScreen();
             Logger.info(getClient(table) + " ready to do order again!");
             waiterCaller.onNext(Tables.class.getSimpleName() + table);
         });
@@ -79,7 +86,9 @@ public class Tables extends Room {
         }
         Main.updateScreen();
         freePlace.add(table);
-        Logger.info("Client is gone (feedback: " + client.feedback + "), chair #" + table + " is free");
+        Main.addToCmd("INFO: Client is gone (feedback: " + client.feedback + "), table #" + table + " is free");
+        Main.updateScreen();
+        Logger.info("Client is gone (feedback: " + client.feedback + "), table #" + table + " is free");
     }
 
     public Toilet getToilet() {
