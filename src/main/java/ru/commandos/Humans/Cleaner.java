@@ -38,24 +38,24 @@ public class Cleaner extends Staff implements Observer<Room> {
                     queue.addLast(this);
                     int place = queue.size() - 1;
                     waiting[0] = false;
+                    Main.kitchenPlaces.get(2).setText("       ");
                     Main.restRoomPlaces.get(place).setText((place + 1) + ".Cleaner ");
+                    Main.updateScreen();
                     Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
                         Logger.info(this.getClass().getSimpleName() + " used Toilet");
                         queue.remove(this);
+                        Main.restRoomPlaces.get(place).setText((place + 1) + ".        ");
+                        Main.kitchenPlaces.get(2).setText("Cleaner");
+                        Main.updateScreen();
                         diner.getHall().getToilet().getDirty();
                         isFree = true;
-                        if (action.isEmpty()) {
-                            Main.kitchenPlaces.get(2).setText("Cleaner");
-                        }
                     });
                 }
             });
-
         } else {
             isFree = true;
-            if (action.isEmpty()) {
-                Main.kitchenPlaces.get(2).setText("Cleaner");
-            }
+            Main.kitchenPlaces.get(2).setText("Cleaner");
+            Main.updateScreen();
         }
     }
 
@@ -73,6 +73,7 @@ public class Cleaner extends Staff implements Observer<Room> {
         action.addLast(actionNumber);
         Observable.interval(1 * Diner.slowdown, TimeUnit.MILLISECONDS).takeWhile(l1 -> !action.isEmpty() && action.peekFirst() <= actionNumber).subscribe(l2 -> {
             if (isFree && action.peekFirst() == actionNumber && room.hasFreePlace()) {
+                Main.kitchenPlaces.get(2).setText("       ");
                 action.pollFirst();
                 isFree = false;
                 Label label;

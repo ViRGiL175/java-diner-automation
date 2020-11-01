@@ -12,6 +12,7 @@ import ru.commandos.Rooms.Bar;
 import ru.commandos.Rooms.Room;
 import ru.commandos.Rooms.Tables;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
@@ -40,13 +41,11 @@ public class Client extends Human {
         if (orderPlace == Room.OrderPlace.TABLES) {
             if (table < 5 || table == 9) {
                 Main.canteenPlaces.get(table).setText((table + 1) + ".Client   ");
-            }
-            else {
+            } else {
                 Main.canteenPlaces.get(table).setText(" " + (table + 1) + ".Client   ");
             }
             Logger.info(this + " sat at the table #" + table);
-        }
-        else {
+        } else {
             Main.counterPlaces.get(table).setText((table + 1) + ".Client   ");
             Logger.info(this + " sat at the chair #" + table);
         }
@@ -117,6 +116,48 @@ public class Client extends Human {
     @Override
     public void useToilet() {
         if (orderPlace != Room.OrderPlace.DRIVETHRU && new Random().nextInt(10) < 2) {
+            ArrayDeque<Human> queue;
+            if (currentRoom instanceof Tables) {
+                queue = ((Tables) currentRoom).getToilet().queue;
+            } else {
+                queue = ((Bar) currentRoom).getToilet().queue;
+            }
+            final boolean[] waiting = {true};
+            Observable.interval(1 * Diner.slowdown, TimeUnit.MILLISECONDS).takeWhile(l1 -> waiting[0]).subscribe(l2 -> {
+                if ((queue.size() - 1) / 4 == 0) {
+                    queue.addLast(this);
+                    int place = queue.size() - 1;
+                    waiting[0] = false;
+                    if (orderPlace == Room.OrderPlace.TABLES) {
+                        if (table < 5 || table == 9) {
+                            Main.canteenPlaces.get(table).setText((table + 1) + ".         ");
+                        } else {
+                            Main.canteenPlaces.get(table).setText(" " + (table + 1) + ".         ");
+                        }
+                    }
+                    else {
+                        Main.counterPlaces.get(table).setText((table + 1) + ".        ");
+                    }
+                    Main.restRoomPlaces.get(place).setText((place + 1) + ".Client   ");
+                    Main.updateScreen();
+                    Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
+                        Logger.info(this.getClass().getSimpleName() + " used Toilet");
+                        queue.remove(this);
+                        Main.restRoomPlaces.get(place).setText((place + 1) + ".        ");
+                        if (orderPlace == Room.OrderPlace.TABLES) {
+                            if (table < 5 || table == 9) {
+                                Main.canteenPlaces.get(table).setText((table + 1) + ".Client   ");
+                            } else {
+                                Main.canteenPlaces.get(table).setText(" " + (table + 1) + ".Client   ");
+                            }
+                        }
+                        else {
+                            Main.counterPlaces.get(table).setText((table + 1) + ".Client   ");
+                        }
+                        Main.updateScreen();
+                    });
+                }
+            });
             Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
                 Logger.info(this.getClass().getSimpleName() + " used Toilet");
                 if (currentRoom instanceof Tables) {

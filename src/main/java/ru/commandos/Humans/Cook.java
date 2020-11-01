@@ -58,10 +58,26 @@ public class Cook extends Staff implements Observer<Order> {
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
-            Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
-                Logger.info(this.getClass().getSimpleName() + " used Toilet");
-                diner.getHall().getToilet().getDirty();
-                isFree = true;
+            ArrayDeque<Human> queue = diner.getHall().getToilet().queue;
+            final boolean[] waiting = {true};
+            Observable.interval(1 * Diner.slowdown, TimeUnit.MILLISECONDS).takeWhile(l1 -> waiting[0]).subscribe(l2 -> {
+                if ((queue.size() - 1) / 4 == 0) {
+                    queue.addLast(this);
+                    int place = queue.size() - 1;
+                    waiting[0] = false;
+                    Main.cookPlaces.get(number).setText("       ");
+                    Main.restRoomPlaces.get(place).setText((place + 1) + ".Cook    ");
+                    Main.updateScreen();
+                    Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
+                        Logger.info(this.getClass().getSimpleName() + " used Toilet");
+                        queue.remove(this);
+                        Main.restRoomPlaces.get(place).setText((place + 1) + ".        ");
+                        Main.cookPlaces.get(number).setText("Cook   ");
+                        Main.updateScreen();
+                        diner.getHall().getToilet().getDirty();
+                        isFree = true;
+                    });
+                }
             });
         }
         else {
