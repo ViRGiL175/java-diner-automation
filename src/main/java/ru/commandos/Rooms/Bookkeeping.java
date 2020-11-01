@@ -61,6 +61,11 @@ public class Bookkeeping extends Room {
     }
 
     @Override
+    public boolean hasFreePlace() {
+        return false;
+    }
+
+    @Override
     public void getDirty() {
         diner.dirtCurrentRoom(this);
     }

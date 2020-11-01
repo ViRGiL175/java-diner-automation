@@ -137,6 +137,24 @@ public class Bar extends Room {
         return diner.getHall().getToilet();
     }
 
+    public int getFreePlace() {
+        int random = new Random().nextInt(freePlace.size());
+        int chair = new ArrayList<>(freePlace).get(random);
+        freePlace.remove(chair);
+        return chair;
+    }
+
+    public void cleanerGone(int chair) {
+        Main.counterPlaces.get(chair).setText((chair + 1) + ".        ");
+        Main.updateScreen();
+        freePlace.add(chair);
+    }
+
+    @Override
+    public boolean hasFreePlace() {
+        return !freePlace.isEmpty();
+    }
+
     @Override
     public void getDirty() {
         diner.dirtCurrentRoom(this);

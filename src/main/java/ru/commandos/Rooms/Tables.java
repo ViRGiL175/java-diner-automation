@@ -86,6 +86,29 @@ public class Tables extends Room {
         return diner.getHall().getToilet();
     }
 
+    public int getFreePlace() {
+        int random = new Random().nextInt(freePlace.size());
+        int table = new ArrayList<>(freePlace).get(random);
+        freePlace.remove(table);
+        return table;
+    }
+
+    public void cleanerGone(int table) {
+        if (table < 5 || table == 9) {
+            Main.canteenPlaces.get(table).setText((table + 1) + ".         ");
+        }
+        else {
+            Main.canteenPlaces.get(table).setText(" " + (table + 1) + ".         ");
+        }
+        Main.updateScreen();
+        freePlace.add(table);
+    }
+
+    @Override
+    public boolean hasFreePlace() {
+        return !freePlace.isEmpty();
+    }
+
     @Override
     public void getDirty() {
         diner.dirtCurrentRoom(this);

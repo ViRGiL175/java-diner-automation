@@ -76,6 +76,11 @@ public class Kitchen extends Room {
     }
 
     @Override
+    public boolean hasFreePlace() {
+        return true;
+    }
+
+    @Override
     public void getDirty() {
         diner.dirtCurrentRoom(this);
     }

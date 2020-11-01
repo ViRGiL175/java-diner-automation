@@ -8,6 +8,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import org.tinylog.Logger;
 import ru.commandos.Diner;
+import ru.commandos.Humans.Cleaner;
 import ru.commandos.Humans.Client;
 import ru.commandos.Humans.WaiterController;
 import ru.commandos.Main;
@@ -43,6 +44,11 @@ public class DriveThru extends Room implements Observer<String> {
     public void subscribe(WaiterController waiterController) {
         caller.subscribe(waiterController);
         Logger.info("Waiters is ready to take orders from Drive-Thru");
+    }
+
+    @Override
+    public boolean hasFreePlace() {
+        return true;
     }
 
     @Override

@@ -11,6 +11,8 @@ import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import org.tinylog.Logger;
 import ru.virgil.OuterWorld;
 
 import java.io.IOException;
@@ -32,10 +34,17 @@ public class Main {
     private static Label loading;
     private static Panel economicPanel;
     private static Panel feedbackPanel;
+    private static Label budget;
+    private static Label economicBudget;
+    private static Label feedbackBudget;
+    public static Panel driveThruPanelList;
+    public static Panel counterPanelList;
+    public static Panel canteenPanelList;
+    public static Panel kitchenPanelList;
+    public static Panel restRoomPanelList;
     public static Label barmenPlace;
     public static Label cleanerPlace;
     public static Label date;
-    public static Label budget;
     public static Button economics;
     public static Button feedback;
     public static ArrayList<Label> cookPlaces;
@@ -49,39 +58,41 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
 
-        Diner.slowdown = 500;
+        Diner.slowdown = 300;
 
-        OuterWorld outerWorld = OuterWorld.singleton(20 * Diner.slowdown, TimeUnit.MILLISECONDS);
+        Observable.just(1).subscribeOn(Schedulers.newThread()).subscribe(v -> {
 
-        Diner diner = new Diner(outerWorld.getClientsSource(), outerWorld.getAutoClientsSource(), outerWorld.getDateSource());
+            OuterWorld outerWorld = OuterWorld.singleton(20 * Diner.slowdown, TimeUnit.MILLISECONDS);
+
+            Diner diner = new Diner(outerWorld.getClientsSource(), outerWorld.getAutoClientsSource(), outerWorld.getDateSource());
+
+            outerWorld.run();
+        });
 
         loadConfig();
-//        loadLoadingScreen();
+        loadLoadingScreen();
 
-        multiWindowTextGUI = new MultiWindowTextGUI(screen, new DefaultWindowManager(), new EmptySpace(new TextColor.RGB(223, 196, 104)));
-        multiWindowTextGUI.addWindow(upWindow);
-        multiWindowTextGUI.addWindow(downWindow);
-//        multiWindowTextGUI.addWindow(loadScreenWindow);
         screen.startScreen();
-        multiWindowTextGUI.updateScreen();
-//        Observable.interval(100, TimeUnit.MILLISECONDS).takeWhile(s -> loadingLabel.get(0).getText().length() > 0).subscribe(v -> {
-//            for (Label label : loadingLabel) {
-//                label.setText(new StringBuilder(label.getText()).deleteCharAt(0).toString());
-//            }
-//            multiWindowTextGUI.updateScreen();
-//            if (loadingLabel.get(0).getText().length() == 1) {
-//                loading.setText("Starting...");
-//                io.reactivex.rxjava3.core.Observable.timer(2000, TimeUnit.MILLISECONDS).subscribe(q -> {
-//                    multiWindowTextGUI.removeWindow(loadScreenWindow);
-//                    multiWindowTextGUI.updateScreen();
-//                });
-//            }
-//        });
-//        Observable.interval(700, TimeUnit.MILLISECONDS).takeWhile(s -> loadingLabel.get(0).getText().length() > 0).subscribe(v -> {
-//            loading();
-//        });
-
-        outerWorld.run();
+        multiWindowTextGUI = new MultiWindowTextGUI(screen, new DefaultWindowManager(), new EmptySpace(new TextColor.RGB(223, 196, 104)));
+        Observable.interval(90 * Diner.slowdown, TimeUnit.MICROSECONDS).takeWhile(s -> loadingLabel.get(0).getText().length() > 0).subscribe(v -> {
+            for (Label label : loadingLabel) {
+                label.setText(new StringBuilder(label.getText()).deleteCharAt(0).toString());
+            }
+            multiWindowTextGUI.updateScreen();
+            if (loadingLabel.get(0).getText().length() == 1) {
+                loading.setText("Starting...");
+                Observable.timer(2000, TimeUnit.MILLISECONDS).subscribe(q -> {
+                    multiWindowTextGUI.removeWindow(loadScreenWindow);
+                    multiWindowTextGUI.updateScreen();
+                });
+            }
+        });
+        Observable.interval(700, TimeUnit.MILLISECONDS).takeWhile(s -> loadingLabel.get(0).getText().length() > 0).subscribe(v -> {
+            loading();
+        });
+        multiWindowTextGUI.addWindowAndWait(loadScreenWindow);
+        multiWindowTextGUI.addWindow(downWindow);
+        multiWindowTextGUI.addWindowAndWait(upWindow);
     }
 
     private static void loading(){
@@ -126,7 +137,6 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     private static void onPressFeedback() {
@@ -172,12 +182,12 @@ public class Main {
 
         Panel buttonPanel = new Panel().addTo(mainPanel);
         buttonPanel.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
-        economics = new Button("[Economics]", Main::onPressEconomics);
+        economics = new Button("Economics", Main::onPressEconomics);
         buttonPanel.addComponent(economics);
         buttonPanel.addComponent(new EmptySpace(new TerminalSize(1, 1)));
-        feedback = new Button("[Feedback]", Main::onPressFeedback);
+        feedback = new Button("Feedback", Main::onPressFeedback);
         buttonPanel.addComponent(feedback);
-        buttonPanel.addComponent(new EmptySpace(new TerminalSize(20, 1)));
+        buttonPanel.addComponent(new EmptySpace(new TerminalSize(27, 1)));
         budget = new Label("Budget: $1000");
         buttonPanel.addComponent(budget);
 
@@ -185,16 +195,17 @@ public class Main {
 
         Panel dinerPanel = new Panel().addTo(mainPanel);
         dinerPanel.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
-        Panel driveThruPanelList = new Panel();
+        driveThruPanelList = new Panel();
         dinerPanel.addComponent(driveThruPanelList.withBorder(Borders.singleLine("D-Thru")));
         driveThruPanelList.setLayoutManager(new LinearLayout(Direction.VERTICAL));
         driveThruPlaces = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 4; i++) {
             driveThruPlaces.add(new Label((i + 1) + ".        "));
             driveThruPanelList.addComponent(driveThruPlaces.get(i));
         }
+        cleanerPlace = new Label("         ").addTo(driveThruPanelList);
 
-        Panel counterPanelList = new Panel();
+        counterPanelList = new Panel();
         dinerPanel.addComponent(counterPanelList.withBorder(Borders.singleLine("Counter")));
         counterPanelList.setLayoutManager(new LinearLayout(Direction.VERTICAL));
         barmenPlace = new Label("Barmen     ").addTo(counterPanelList);
@@ -204,7 +215,7 @@ public class Main {
             counterPanelList.addComponent(counterPlaces.get(i));
         }
 
-        Panel canteenPanelList = new Panel();
+        canteenPanelList = new Panel();
         dinerPanel.addComponent(canteenPanelList.withBorder(Borders.singleLine("Canteen")));
         canteenPanelList.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
         Panel canteenPanelListFirst = new Panel().addTo(canteenPanelList);
@@ -222,7 +233,7 @@ public class Main {
         canteenPlaces.add(new Label(10 + ".         "));
         canteenPanelListSecond.addComponent(canteenPlaces.get(9));
 
-        Panel kitchenPanelList = new Panel();
+        kitchenPanelList = new Panel();
         dinerPanel.addComponent(kitchenPanelList.withBorder(Borders.singleLine("Kitchen")));
         kitchenPanelList.setLayoutManager(new LinearLayout(Direction.VERTICAL));
         cookPlaces = new ArrayList<>();
@@ -236,7 +247,7 @@ public class Main {
             kitchenPanelList.addComponent(kitchenPlaces.get(i));
         }
 
-        Panel restRoomPanelList = new Panel();
+        restRoomPanelList = new Panel();
         dinerPanel.addComponent(restRoomPanelList.withBorder(Borders.singleLine("Restroom")));
         restRoomPanelList.setLayoutManager(new LinearLayout(Direction.VERTICAL));
         restRoomPlaces = new ArrayList<>();
@@ -244,7 +255,6 @@ public class Main {
             restRoomPlaces.add(new Label((i + 1) + ".        "));
             restRoomPanelList.addComponent(restRoomPlaces.get(i));
         }
-        cleanerPlace = new Label("        ").addTo(restRoomPanelList);
 
         Panel legendPanel = new Panel().addTo(mainPanel);
         legendPanel.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
@@ -272,6 +282,15 @@ public class Main {
 
         economicPanel = new Panel();
         economicPanel.setLayoutManager(new LinearLayout(Direction.VERTICAL));
+        Panel economicDatePanel = new Panel().addTo(economicPanel);
+        economicDatePanel.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+        economicDatePanel.addComponent(new EmptySpace(new TerminalSize(30, 1)));
+        economicDatePanel.addComponent(new Label(s));
+        Panel economicButtonPanel = new Panel().addTo(economicPanel);
+        economicButtonPanel.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+        Button economicBack = new Button("Back", Main::onPressBack).addTo(economicButtonPanel);
+        economicButtonPanel.addComponent(new EmptySpace(new TerminalSize(43, 1)));
+        economicBudget = new Label("Budget: $1000").addTo(economicButtonPanel);
         economicLabels = new ArrayList<>();
 
         economicsWindow = new BasicWindow();
@@ -281,12 +300,21 @@ public class Main {
 
         feedbackPanel = new Panel();
         feedbackPanel.setLayoutManager(new LinearLayout(Direction.VERTICAL));
+        Panel feedbakDatePanel = new Panel().addTo(feedbackPanel);
+        feedbakDatePanel.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+        feedbakDatePanel.addComponent(new EmptySpace(new TerminalSize(30, 1)));
+        feedbakDatePanel.addComponent(new Label(s));
+        Panel feedbackButtonPanel = new Panel().addTo(feedbackPanel);
+        feedbackButtonPanel.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+        Button feedBack = new Button("Back", Main::onPressBack).addTo(feedbackButtonPanel);
+        feedbackButtonPanel.addComponent(new EmptySpace(new TerminalSize(43, 1)));
+        feedbackBudget = new Label("Budget: $1000").addTo(feedbackButtonPanel);
         feedbackLabels = new ArrayList<>();
 
         feedbackWindow = new BasicWindow();
         feedbackWindow.setHints(Arrays.asList(Window.Hint.FULL_SCREEN));
         feedbackWindow.setComponent(feedbackPanel);
-        economicsWindow.setTheme(new SimpleTheme(new TextColor.RGB(188, 111, 95), new TextColor.RGB(223, 196, 104), SGR.BOLD));
+        feedbackWindow.setTheme(new SimpleTheme(new TextColor.RGB(188, 111, 95), new TextColor.RGB(223, 196, 104), SGR.BOLD));
     }
 
     public static void addToEconomicLabels(String s) {
@@ -331,9 +359,13 @@ public class Main {
     public static void updateBudget(Double money, Double dinamic) {
         if (dinamic == null) {
             budget.setText("Budget: $" + String.format("%.2f", money));
+            economicBudget.setText(budget.getText());
+            feedbackBudget.setText(budget.getText());
         }
         else {
             budget.setText("Budget: $" + String.format("%.2f", money) + ", $" + String.format("%.2f", dinamic) + "/mo.");
+            economicBudget.setText(budget.getText());
+            feedbackBudget.setText(budget.getText());
         }
         updateScreen();
     }

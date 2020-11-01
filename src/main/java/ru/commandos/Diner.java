@@ -8,6 +8,7 @@ import ru.commandos.Rooms.*;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
 
 public class Diner {
@@ -30,6 +31,7 @@ public class Diner {
     private final HashMap<Room, Integer> roomDirt = new HashMap<>();
     private final HashMap<Room, Integer> maxRoomDirt = new HashMap<>();
     private final HashMap<Room, Integer> maxRoomDirtSpeed = new HashMap<>();
+    private final HashSet<Room> callerRoom = new HashSet<>();
     {
         roomDirt.put(hall.getTables(), 0);
         roomDirt.put(hall.getBar(), 0);
@@ -68,14 +70,16 @@ public class Diner {
     public void dirtCurrentRoom(Room room) {
         int dirt = roomDirt.get(room) + new Random().nextInt(maxRoomDirtSpeed.get(room) + 1);
         roomDirt.replace(room, dirt);
-        if (roomDirt.get(room) >= maxRoomDirt.get(room)) {
+        if (roomDirt.get(room) >= maxRoomDirt.get(room) && !callerRoom.contains(room)) {
             Logger.warn("Critical pollution in " + room.getClass().getSimpleName() + ": " + dirt);
+            callerRoom.add(room);
             cleanerCaller.onNext(room);
         }
     }
 
     public void clean(Room room) {
         roomDirt.replace(room, 0);
+        callerRoom.remove(room);
         Logger.info("Cleaner tidied up in " + room.getClass().getSimpleName());
     }
 
