@@ -89,20 +89,31 @@ public class Waiter extends Staff implements Observer<String> {
                 kitchen.acceptOrder(order);
             }
             if (!order.drinks.isEmpty()) {
-                move(diner.getHall().getBar());
-                Logger.debug("Order has been transferred to Bar " + order);
-                diner.getHall().getBar().acceptOrder(order);
+                Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(s -> {
+                    move(diner.getHall().getBar());
+                    Logger.debug("Order has been transferred to Bar " + order);
+                    diner.getHall().getBar().acceptOrder(order);
+                });
             }
             isFree = true;
         });
     }
 
     private void carryOrder(Order order) {
+        int k = 1;
+        if (currentRoom != kitchen) {
+            k = 1000;
+            move(kitchen);
+        }
+        else {
         Logger.debug("Waiter " + number + " took the ready Order");
-        Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
+        }
+        Observable.timer(1 * Diner.slowdown + k, TimeUnit.MILLISECONDS).subscribe(v -> {
             if (order.orderPlace == Room.OrderPlace.DRIVETHRU) {
                 move(driveThru);
                 driveThru.getCar().setOrder(order);
+                Main.driveThruPlaces.get(0).setText("1.Auto    ");
+                Main.updateScreen();
                 Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(s -> {
                     changeMoney(driveThru.getCar().pay());
                     driveThru.carGone();
@@ -160,6 +171,20 @@ public class Waiter extends Staff implements Observer<String> {
 
     public int getActionSize() {
         return action.size();
+    }
+
+    @Override
+    public void move(Room room) {
+        if (currentRoom == kitchen) {
+            Main.kitchenPlaces.get(number).setText("       ");
+            Main.updateScreen();
+        }
+        currentRoom = room;
+        if (currentRoom == kitchen) {
+            Main.kitchenPlaces.get(number).setText("Waiter ");
+            Main.updateScreen();
+        }
+        currentRoom.getDirty();
     }
 
     @Override

@@ -20,7 +20,7 @@ public class WaiterController implements Observer<String> {
     public WaiterController(Diner diner) {
         this.diner = diner;
         for (int i = 0; i < 2; i++) {
-            waiters.add(new Waiter(diner, diner.getKitchen(), diner.getDriveThru(), i + 1));
+            waiters.add(new Waiter(diner, diner.getKitchen(), diner.getDriveThru(), i));
             waiterCaller.put(i, PublishSubject.create());
             waiterCaller.get(i).subscribe(waiters.get(i));
         }

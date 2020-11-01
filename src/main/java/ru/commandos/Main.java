@@ -33,6 +33,7 @@ public class Main {
     private static Panel economicPanel;
     private static Panel feedbackPanel;
     public static Label barmenPlace;
+    public static Label cleanerPlace;
     public static Label date;
     public static Label budget;
     public static Button economics;
@@ -231,7 +232,7 @@ public class Main {
         }
         kitchenPlaces = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
-            kitchenPlaces.add(new Label((i + 1) + ".       "));
+            kitchenPlaces.add(new Label("       "));
             kitchenPanelList.addComponent(kitchenPlaces.get(i));
         }
 
@@ -243,6 +244,7 @@ public class Main {
             restRoomPlaces.add(new Label((i + 1) + ".        "));
             restRoomPanelList.addComponent(restRoomPlaces.get(i));
         }
+        cleanerPlace = new Label("        ").addTo(restRoomPanelList);
 
         Panel legendPanel = new Panel().addTo(mainPanel);
         legendPanel.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
