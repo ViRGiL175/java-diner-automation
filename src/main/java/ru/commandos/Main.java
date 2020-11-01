@@ -12,7 +12,6 @@ import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import org.tinylog.Logger;
 import ru.virgil.OuterWorld;
 
 import java.io.IOException;
@@ -29,14 +28,18 @@ public class Main {
     private static BasicWindow loadScreenWindow;
     private static BasicWindow economicsWindow;
     private static BasicWindow feedbackWindow;
-    private static final Calendar calendar = new GregorianCalendar();
     private static ArrayList<Label> loadingLabel;
     private static Label loading;
     private static Panel economicPanel;
     private static Panel feedbackPanel;
+    private static Panel cmd;
     private static Label budget;
     private static Label economicBudget;
     private static Label feedbackBudget;
+    private static final RadioBoxList<String> downWindowRadioBoxList = new RadioBoxList<>();
+    private static final RadioBoxList<String> economicRadioBoxList = new RadioBoxList<>();
+    private static final RadioBoxList<String> feedbackRadioBoxList = new RadioBoxList<>();
+    public static final Calendar calendar = new GregorianCalendar();
     public static Panel driveThruPanelList;
     public static Panel counterPanelList;
     public static Panel canteenPanelList;
@@ -95,7 +98,7 @@ public class Main {
         multiWindowTextGUI.addWindowAndWait(upWindow);
     }
 
-    private static void loading(){
+    private static void loading() {
         loading.setText(loading.getText() + ".");
         if (loading.getText().length() > 10 && !loading.getText().equals("Starting...")) {
             loading.setText(new StringBuilder(loading.getText()).delete(7, 11).toString());
@@ -152,10 +155,9 @@ public class Main {
     private static void onPressBack() {
 
         try {
-            if(multiWindowTextGUI.getWindows().contains(economicsWindow)) {
+            if (multiWindowTextGUI.getWindows().contains(economicsWindow)) {
                 multiWindowTextGUI.removeWindow(economicsWindow);
-            }
-            else {
+            } else {
                 multiWindowTextGUI.removeWindow(feedbackWindow);
             }
             multiWindowTextGUI.updateScreen();
@@ -175,7 +177,7 @@ public class Main {
 
         Panel datePanel = new Panel().addTo(mainPanel);
         datePanel.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
-        String s = calendar.get(Calendar.DAY_OF_MONTH) + " " + (calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("en"))) + " " + calendar.get(Calendar.YEAR);
+        String s = calendar.get(Calendar.DAY_OF_MONTH) + " " + (calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("en"))) + " " + (calendar.get(Calendar.YEAR) - 57);
         date = new Label(s);
         datePanel.addComponent(new EmptySpace(new TerminalSize(30, 1)));
         datePanel.addComponent(date);
@@ -259,7 +261,7 @@ public class Main {
         Panel legendPanel = new Panel().addTo(mainPanel);
         legendPanel.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
         Label legendLabel = new Label("Legend: C - cooking, W - waiting, O - ordering").addTo(legendPanel);
-        legendPanel.addComponent(new EmptySpace(new TerminalSize(16,1)));
+        legendPanel.addComponent(new EmptySpace(new TerminalSize(16, 1)));
         Label link = new Label("DinerInter.com").addTo(legendPanel);
 
         upWindow = new BasicWindow();
@@ -269,9 +271,10 @@ public class Main {
         upWindow.setComponent(mainPanel);
         upWindow.setTheme(new SimpleTheme(new TextColor.RGB(188, 111, 95), new TextColor.RGB(223, 196, 104), SGR.BOLD));
 
-        Panel cmd = new Panel();
+        cmd = new Panel();
         cmd.setLayoutManager(new LinearLayout(Direction.VERTICAL));
-        Label output = new Label("").addTo(cmd);
+        cmd.addComponent(downWindowRadioBoxList);
+        downWindowRadioBoxList.addItem("Diner Advanced Logging:");
 
         downWindow = new BasicWindow();
         downWindow.setPosition(new TerminalPosition(0, terminal.getTerminalSize().getRows() / 2 + 1));
@@ -291,6 +294,7 @@ public class Main {
         Button economicBack = new Button("Back", Main::onPressBack).addTo(economicButtonPanel);
         economicButtonPanel.addComponent(new EmptySpace(new TerminalSize(43, 1)));
         economicBudget = new Label("Budget: $1000").addTo(economicButtonPanel);
+        economicPanel.addComponent(economicRadioBoxList);
         economicLabels = new ArrayList<>();
 
         economicsWindow = new BasicWindow();
@@ -299,16 +303,16 @@ public class Main {
         economicsWindow.setTheme(new SimpleTheme(new TextColor.RGB(188, 111, 95), new TextColor.RGB(223, 196, 104), SGR.BOLD));
 
         feedbackPanel = new Panel();
-        feedbackPanel.setLayoutManager(new LinearLayout(Direction.VERTICAL));
-        Panel feedbakDatePanel = new Panel().addTo(feedbackPanel);
-        feedbakDatePanel.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
-        feedbakDatePanel.addComponent(new EmptySpace(new TerminalSize(30, 1)));
-        feedbakDatePanel.addComponent(new Label(s));
+        Panel feedbackDatePanel = new Panel().addTo(feedbackPanel);
+        feedbackDatePanel.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+        feedbackDatePanel.addComponent(new EmptySpace(new TerminalSize(30, 1)));
+        feedbackDatePanel.addComponent(new Label(s));
         Panel feedbackButtonPanel = new Panel().addTo(feedbackPanel);
         feedbackButtonPanel.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
         Button feedBack = new Button("Back", Main::onPressBack).addTo(feedbackButtonPanel);
         feedbackButtonPanel.addComponent(new EmptySpace(new TerminalSize(43, 1)));
         feedbackBudget = new Label("Budget: $1000").addTo(feedbackButtonPanel);
+        feedbackPanel.addComponent(feedbackRadioBoxList);
         feedbackLabels = new ArrayList<>();
 
         feedbackWindow = new BasicWindow();
@@ -317,28 +321,20 @@ public class Main {
         feedbackWindow.setTheme(new SimpleTheme(new TextColor.RGB(188, 111, 95), new TextColor.RGB(223, 196, 104), SGR.BOLD));
     }
 
+    public static void addToCmd(String s1, String s2) {
+        downWindowRadioBoxList.addItem("                                                                                                                        ");
+        downWindowRadioBoxList.addItem(s1);
+        downWindowRadioBoxList.addItem(s2);
+    }
+
     public static void addToEconomicLabels(String s) {
-        Label label = new Label(s);
-        economicLabels.add(label);
-        if (economicLabels.size() == 1) {
-            economicPanel.addComponent(label);
-        }
-        else {
-            economicPanel.addComponent(new EmptySpace(new TerminalSize(1, 1)));
-            economicPanel.addComponent(label);
-        }
+        economicRadioBoxList.addItem("                                                                                                                        ");
+        economicRadioBoxList.addItem(s);
     }
 
     public static void addToFeedbackLabels(String s) {
-        Label label = new Label(s);
-        feedbackLabels.add(label);
-        if (feedbackLabels.size() == 1) {
-            feedbackPanel.addComponent(label);
-        }
-        else {
-            feedbackPanel.addComponent(new EmptySpace(new TerminalSize(1, 1)));
-            feedbackPanel.addComponent(label);
-        }
+        feedbackRadioBoxList.addItem("                                                                                                                        ");
+        feedbackRadioBoxList.addItem(s);
     }
 
     public static void updateScreen() {
@@ -350,9 +346,8 @@ public class Main {
     }
 
     public static void updateDate(Date date) {
-        Calendar calendar = new GregorianCalendar();
         calendar.setTime(date);
-        Main.date.setText(calendar.get(Calendar.DAY_OF_MONTH) + " " + (calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("en"))) + " " + calendar.get(Calendar.YEAR));
+        Main.date.setText(calendar.get(Calendar.DAY_OF_MONTH) + " " + (calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("en"))) + " " + (calendar.get(Calendar.YEAR) - 57));
         updateScreen();
     }
 
@@ -361,8 +356,7 @@ public class Main {
             budget.setText("Budget: $" + String.format("%.2f", money));
             economicBudget.setText(budget.getText());
             feedbackBudget.setText(budget.getText());
-        }
-        else {
+        } else {
             budget.setText("Budget: $" + String.format("%.2f", money) + ", $" + String.format("%.2f", dinamic) + "/mo.");
             economicBudget.setText(budget.getText());
             feedbackBudget.setText(budget.getText());

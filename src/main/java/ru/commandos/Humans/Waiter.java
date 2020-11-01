@@ -24,7 +24,8 @@ public class Waiter extends Staff implements Observer<String> {
     private long actionCount;
     private final Deque<Long> action = new ArrayDeque<>();
 
-    private int number;
+    private final int number;
+    private double clientMoney;
 
     public Waiter(Diner diner, Kitchen kitchen, DriveThru driveThru, int number) {
         super(diner);
@@ -115,7 +116,7 @@ public class Waiter extends Staff implements Observer<String> {
                 Main.driveThruPlaces.get(0).setText("1.Auto    ");
                 Main.updateScreen();
                 Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(s -> {
-                    changeMoney(driveThru.getCar().pay());
+                    clientMoney = driveThru.getCar().pay();
                     driveThru.carGone();
                 });
                 Observable.timer(2 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(s -> {
@@ -132,7 +133,7 @@ public class Waiter extends Staff implements Observer<String> {
                 }
                 Main.updateScreen();
                 Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(s -> {
-                    changeMoney(client.pay());
+                    clientMoney = client.pay();
                     if ((client.getMoney() < diner.getMenu().food.values().stream().min(Double::compare).get()
                             && client.getMoney() < diner.getMenu().drinks.values().stream().min(Double::compare).get())
                             || new Random().nextInt(10) > 3) {
@@ -164,8 +165,8 @@ public class Waiter extends Staff implements Observer<String> {
     private void givePaymentToBookkeeper() {
         Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
             move(diner.getBookkeeping());
-            diner.getBookkeeper().giveClientPayment(getMoney());
-            money = "$0";
+            diner.getBookkeeper().giveClientPayment(clientMoney);
+            clientMoney = 0;
         });
     }
 

@@ -33,6 +33,7 @@ public class Bookkeeper extends Staff implements Observer<Date> {
         Double tax = BD * FP * K1 * K2 * 15.0 / 100.0;
         if (tax <= bookkeeping.checkBudget()) {
             bookkeeping.getMoneyFromBudget(tax);
+            Main.addToEconomicLabels((Main.calendar.get(Calendar.YEAR) - 57) + ", " + Main.calendar.get(Calendar.DAY_OF_MONTH) + " " + Main.calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("en")) + ", " + Main.calendar.get(Calendar.HOUR_OF_DAY) + ":" + Main.calendar.get(Calendar.MINUTE) + ":" + " Tax = -$" + String.format("%.2f", tax));
             Logger.info("Taxes paid");
         } else {
             Logger.warn("Taxes not paid due to lack of money");
@@ -45,15 +46,18 @@ public class Bookkeeper extends Staff implements Observer<Date> {
         for (Staff staff : pay.keySet()) {
             if (pay.get(staff) <= bookkeeping.checkBudget()) {
                 Double money = bookkeeping.getMoneyFromBudget(pay.get(staff));
+                Main.addToEconomicLabels((Main.calendar.get(Calendar.YEAR) - 57) + ", " + Main.calendar.get(Calendar.DAY_OF_MONTH) + " " + Main.calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("en")) + ", " + Main.calendar.get(Calendar.HOUR_OF_DAY) + ":" + Main.calendar.get(Calendar.MINUTE) + ":" + staff.getClass().getSimpleName() + " receive a salary = -$" + String.format("%.2f", money));
                 staff.changeMoney(money);
                 Logger.debug(staff.getClass().getSimpleName() + " receive a salary");
             } else {
+                Main.addToEconomicLabels((Main.calendar.get(Calendar.YEAR) - 57) + ", " + Main.calendar.get(Calendar.DAY_OF_MONTH) + " " + Main.calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("en")) + ", " + Main.calendar.get(Calendar.HOUR_OF_DAY) + ":" + Main.calendar.get(Calendar.MINUTE) + ":" + staff.getClass().getSimpleName() + " didn't receive a salary");
                 Logger.warn(staff.getClass().getSimpleName() + " didn't receive a salary");
             }
         }
     }
 
     public void giveClientPayment(Double payment) {
+        Main.addToEconomicLabels((Main.calendar.get(Calendar.YEAR) - 57) + ", " + Main.calendar.get(Calendar.DAY_OF_MONTH) + " " + Main.calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("en")) + ", " + Main.calendar.get(Calendar.HOUR_OF_DAY) + ":" + Main.calendar.get(Calendar.MINUTE) + ": Serve a client = +$" + String.format("%.2f", payment));
         bookkeeping.putMoneyInBudget(payment);
     }
 

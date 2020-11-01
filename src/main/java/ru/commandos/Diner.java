@@ -1,15 +1,13 @@
 package ru.commandos;
 
+import com.googlecode.lanterna.gui2.Label;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import org.tinylog.Logger;
 import ru.commandos.Humans.*;
 import ru.commandos.Rooms.*;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Random;
+import java.util.*;
 
 public class Diner {
 
@@ -102,6 +100,8 @@ public class Diner {
         } else {
             client.feedback = Client.Feedback.BAD;
         }
+        Main.addToFeedbackLabels((Main.calendar.get(Calendar.YEAR) - 57) + ", " + Main.calendar.get(Calendar.DAY_OF_MONTH) + " " + Main.calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("en")) + ", " + Main.calendar.get(Calendar.HOUR_OF_DAY) + ":" + Main.calendar.get(Calendar.MINUTE) + ":" + client.feedback);
+
     }
 
     public int hashMapValuesSum(HashMap<Room, Integer> map) {

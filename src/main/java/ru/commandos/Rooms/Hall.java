@@ -7,6 +7,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import org.tinylog.Logger;
 import ru.commandos.Diner;
 import ru.commandos.Humans.Client;
+import ru.commandos.Main;
 
 import java.util.Random;
 

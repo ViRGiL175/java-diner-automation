@@ -24,6 +24,7 @@ public class Barmen extends Staff implements Observer<String> {
     private boolean isFree = true;
     private long actionCount;
     private final Deque<Long> action = new ArrayDeque<>();
+    private double clientMoney;
 
     public Barmen(Diner diner, Bar bar) {
         super(diner);
@@ -101,7 +102,7 @@ public class Barmen extends Staff implements Observer<String> {
             Main.updateScreen();
         });
         Observable.timer(2 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
-            changeMoney(client.pay());
+            clientMoney = client.pay();
             if ((client.getMoney() < diner.getMenu().food.values().stream().min(Double::compare).get()
                     && client.getMoney() < diner.getMenu().drinks.values().stream().min(Double::compare).get())
                     || new Random().nextInt(10) > 3) {
@@ -119,8 +120,8 @@ public class Barmen extends Staff implements Observer<String> {
     }
 
     private void givePaymentToBookkeeper() {
-        diner.getBookkeeper().giveClientPayment(getMoney());
-        money = "$0";
+        diner.getBookkeeper().giveClientPayment(clientMoney);
+        clientMoney = 0;
     }
 
     @Override
