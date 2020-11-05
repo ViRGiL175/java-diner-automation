@@ -7,6 +7,8 @@ import ru.commandos.Diner;
 import ru.commandos.Humans.Barmen;
 import ru.commandos.Humans.Client;
 import ru.commandos.Humans.Waiter;
+import ru.commandos.Humans.WaiterController;
+import ru.commandos.Main;
 import ru.commandos.Order;
 
 import java.util.*;
@@ -29,7 +31,7 @@ public class Bar extends Room {
     private final HashSet<Integer> freePlace = new HashSet<>();
 
     {
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 4; i++) {
             chairs.add(null);
             freePlace.add(i);
         }
@@ -65,16 +67,22 @@ public class Bar extends Room {
             chairs.set(chair, client);
             freePlace.remove(chair);
             Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
+                Main.addToCmd("INFO: " + client + " ready to do order!");
+                Main.updateScreen();
                 Logger.info(client + " ready to do order!");
                 barmenCaller.onNext(Bar.class.getSimpleName() + chair);
             });
         } else {
+            Main.addToCmd("No place in Counter!");
+            Main.updateScreen();
             Logger.info("No place!");
         }
     }
 
     public void reOrder(Integer chair) {
         Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
+            Main.addToCmd("INFO: " + getClient(chair) + " ready to do order again!");
+            Main.updateScreen();
             Logger.info(getClient(chair) + " ready to do order again!");
             barmenCaller.onNext(Bar.class.getSimpleName() + chair);
         });
@@ -84,7 +92,10 @@ public class Bar extends Room {
         Client client = getClient(chair);
         diner.feedback(client);
         chairs.set(chair, null);
+        Main.counterPlaces.get(chair).setText((chair + 1) + ".        ");
         freePlace.add(chair);
+        Main.addToCmd("INFO: Client is gone (feedback: " + client.feedback + "), chair #" + chair + " is free");
+        Main.updateScreen();
         Logger.info("Client is gone (feedback: " + client.feedback + "), chair #" + chair + " is free");
     }
 
@@ -121,8 +132,8 @@ public class Bar extends Room {
     }
 
 
-    public void subscribe(Waiter waiter) {
-        waiterCaller.subscribe(waiter);
+    public void subscribe(WaiterController waiterController) {
+        waiterCaller.subscribe(waiterController);
     }
 
     public void subscribe(Barmen barmen) {
@@ -131,6 +142,24 @@ public class Bar extends Room {
 
     public Toilet getToilet() {
         return diner.getHall().getToilet();
+    }
+
+    public int getFreePlace() {
+        int random = new Random().nextInt(freePlace.size());
+        int chair = new ArrayList<>(freePlace).get(random);
+        freePlace.remove(chair);
+        return chair;
+    }
+
+    public void cleanerGone(int chair) {
+        Main.counterPlaces.get(chair).setText((chair + 1) + ".        ");
+        Main.updateScreen();
+        freePlace.add(chair);
+    }
+
+    @Override
+    public boolean hasFreePlace() {
+        return !freePlace.isEmpty();
     }
 
     @Override

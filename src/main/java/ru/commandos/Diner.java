@@ -1,14 +1,13 @@
 package ru.commandos;
 
+import com.googlecode.lanterna.gui2.Label;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import org.tinylog.Logger;
 import ru.commandos.Humans.*;
 import ru.commandos.Rooms.*;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.*;
 
 public class Diner {
 
@@ -20,9 +19,9 @@ public class Diner {
     private final Hall hall = new Hall(this);
     private final DriveThru driveThru = new DriveThru(this);
     private final Kitchen kitchen = new Kitchen(this);
-    private final Cook cook = new Cook(this, kitchen);
     private final Barmen barmen = new Barmen(this, hall.getBar());
-    private final Waiter waiter = new Waiter(this, kitchen, driveThru);
+    private final CookController cookController = new CookController(this);
+    private final WaiterController waiterController = new WaiterController(this);
     private final Bookkeeping bookkeeping = new Bookkeeping(this);
     private final Bookkeeper bookkeeper = new Bookkeeper(this, bookkeeping);
     private final Cleaner cleaner = new Cleaner(this);
@@ -30,6 +29,8 @@ public class Diner {
     private final HashMap<Room, Integer> roomDirt = new HashMap<>();
     private final HashMap<Room, Integer> maxRoomDirt = new HashMap<>();
     private final HashMap<Room, Integer> maxRoomDirtSpeed = new HashMap<>();
+    private final HashMap<String, String> roomName = new HashMap<>();
+    private final HashSet<Room> callerRoom = new HashSet<>();
     {
         roomDirt.put(hall.getTables(), 0);
         roomDirt.put(hall.getBar(), 0);
@@ -51,31 +52,45 @@ public class Diner {
         maxRoomDirtSpeed.put(kitchen, 10);
         maxRoomDirtSpeed.put(bookkeeping, 2);
         maxRoomDirtSpeed.put(hall.getToilet(), 10);
+
+        roomName.put(Bar.class.getSimpleName(), "Counter");
+        roomName.put(Bookkeeping.class.getSimpleName(), Bookkeeping.class.getSimpleName());
+        roomName.put(DriveThru.class.getSimpleName(), "D-Thru");
+        roomName.put(Kitchen.class.getSimpleName(), Kitchen.class.getSimpleName());
+        roomName.put(Tables.class.getSimpleName(), "Canteen");
+        roomName.put(Toilet.class.getSimpleName(), "Restroom");
     }
 
-    public Diner(Observable<String> jsonObservable, Observable<Date> dateObservable) {
+    public Diner(Observable<String> clientObservable, Observable<String> autoObservable, Observable<Date> dateObservable) {
         bookkeeping.createPayMap();
+        Main.addToCmd("INFO: Diner is starting work");
         Logger.info("Diner is starting work");
-        kitchen.subscribe(cook);
-        kitchen.subscribe(waiter);
+        kitchen.subscribe(cookController);
+        kitchen.subscribe(waiterController);
         cleanerCaller.subscribe(cleaner);
-        jsonObservable.subscribe(hall);
+        clientObservable.subscribe(hall);
         dateObservable.subscribe(bookkeeper);
-//        jsonObservable.subscribe(driveThru);
-//        driveThru.subscribe(waiter);
+        autoObservable.subscribe(driveThru);
+        driveThru.subscribe(waiterController);
     }
 
     public void dirtCurrentRoom(Room room) {
         int dirt = roomDirt.get(room) + new Random().nextInt(maxRoomDirtSpeed.get(room) + 1);
         roomDirt.replace(room, dirt);
-        if (roomDirt.get(room) >= maxRoomDirt.get(room)) {
+        if (roomDirt.get(room) >= maxRoomDirt.get(room)/2 && !callerRoom.contains(room)) {
+            Main.addToCmd("WARN: Critical pollution in " + roomName.get(room.getClass().getSimpleName()) + ": " + dirt);
+            Main.updateScreen();
             Logger.warn("Critical pollution in " + room.getClass().getSimpleName() + ": " + dirt);
+            callerRoom.add(room);
             cleanerCaller.onNext(room);
         }
     }
 
     public void clean(Room room) {
         roomDirt.replace(room, 0);
+        callerRoom.remove(room);
+        Main.addToCmd("INFO: Cleaner tidied up in " + roomName.get(room.getClass().getSimpleName()));
+        Main.updateScreen();
         Logger.info("Cleaner tidied up in " + room.getClass().getSimpleName());
     }
 
@@ -98,6 +113,7 @@ public class Diner {
         } else {
             client.feedback = Client.Feedback.BAD;
         }
+        Main.addToFeedbackLabels((Main.calendar.get(Calendar.YEAR) - 57) + ", " + Main.calendar.get(Calendar.DAY_OF_MONTH) + " " + Main.calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("en")) + ", " + ((Main.calendar.get(Calendar.HOUR_OF_DAY) > 10) ? Main.calendar.get(Calendar.HOUR_OF_DAY) : "0" + Main.calendar.get(Calendar.HOUR_OF_DAY)) + ":" + ((Main.calendar.get(Calendar.MINUTE) > 10) ? Main.calendar.get(Calendar.MINUTE) : "0" + Main.calendar.get(Calendar.MINUTE)) + ":" + client.feedback);
     }
 
     public int hashMapValuesSum(HashMap<Room, Integer> map) {
@@ -132,15 +148,15 @@ public class Diner {
         return bookkeeper;
     }
 
-    public Waiter getWaiter() {
-        return waiter;
+    public WaiterController getWaiterController() {
+        return waiterController;
     }
 
     public Barmen getBarmen() {
         return barmen;
     }
 
-    public Cook getCook() {
-        return cook;
+    public CookController getCookController() {
+        return cookController;
     }
 }

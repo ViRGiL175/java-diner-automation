@@ -6,6 +6,7 @@ import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import org.tinylog.Logger;
 import ru.commandos.Diner;
+import ru.commandos.Main;
 import ru.commandos.Order;
 import ru.commandos.Rooms.*;
 
@@ -16,46 +17,80 @@ import java.util.concurrent.TimeUnit;
 
 public class Waiter extends Staff implements Observer<String> {
 
-    Order order;
-    Kitchen kitchen;
-    DriveThru driveThru;
+    private Order order;
+    private final Kitchen kitchen;
+    private final DriveThru driveThru;
     private boolean isFree = true;
     private long actionCount;
     private final Deque<Long> action = new ArrayDeque<>();
 
-    public Waiter(Diner diner, Kitchen kitchen, DriveThru driveThru) {
+    private final int number;
+    private double clientMoney;
+
+    public Waiter(Diner diner, Kitchen kitchen, DriveThru driveThru, int number) {
         super(diner);
         this.kitchen = kitchen;
+        this.number = number;
         this.driveThru = driveThru;
     }
 
     public void acceptTablesOrder(Integer tableNumber) {
+        if (tableNumber < 5 || tableNumber == 9) {
+            Main.canteenPlaces.get(tableNumber).setText((tableNumber + 1) + ".Client(O)");
+        } else {
+            Main.canteenPlaces.get(tableNumber).setText(" " + (tableNumber + 1) + ".Client(O)");
+        }
+        Main.updateScreen();
         Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
             move(diner.getHall().getTables());
             diner.getHall().getTables().getClient(tableNumber).setMenu(diner.getMenu());
             order = diner.getHall().getTables().getClient(tableNumber).getOrder();
             if (order.cost == 0.) {
+                Main.addToCmd("INFO: Client hasn't ordered");
+                Main.updateScreen();
                 Logger.info("Client hasn't ordered");
                 diner.getHall().getTables().clientGone(order.table);
                 isFree = true;
             } else {
-                Logger.info("Waiter took Order at Tables: " + order);
+                Main.addToCmd("INFO: Waiter took Order at Canteen: Order{",
+                        "dishes=" + order.dishes.toString(),
+                        "drinks=" + order.drinks.toString(),
+                        "table=" + order.table.toString(), "cost=" + String.valueOf(order.cost) + "}");
+                Main.updateScreen();
+                Logger.info("Waiter " + number + " took Order at Tables: " + order);
+                if (tableNumber < 5 || tableNumber == 9) {
+                    Main.canteenPlaces.get(tableNumber).setText((tableNumber + 1) + ".Client(W)");
+                } else {
+                    Main.canteenPlaces.get(tableNumber).setText(" " + (tableNumber + 1) + ".Client(W)");
+                }
+                Main.updateScreen();
                 transferOrder(order);
             }
         });
     }
 
     public void acceptDriveThruOrder() {
+        Main.driveThruPlaces.get(0).setText("1.Auto(O) ");
+        Main.updateScreen();
         Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
             move(diner.getDriveThru());
             driveThru.getCar().setMenu(diner.getMenu());
             order = driveThru.getCar().getOrder();
             if (order.cost == 0.) {
+                Main.addToCmd("INFO: Client hasn't ordered");
+                Main.updateScreen();
                 Logger.info("Client hasn't ordered");
                 driveThru.carGone();
                 isFree = true;
             } else {
-                Logger.info("Waiter took Order at Drive-Thru: " + order);
+                Main.addToCmd("INFO: Waiter took Order at D-Thru: Order{",
+                        "dishes=" + order.dishes.toString(),
+                        "drinks=" + order.drinks.toString(),
+                        "table=" + ((order.orderPlace == Room.OrderPlace.DRIVETHRU) ? "D-Thru" : order.table.toString()), "cost=" + String.valueOf(order.cost) + "}");
+                Main.updateScreen();
+                Logger.info("Waiter " + number + " took Order at Drive-Thru: " + order);
+                Main.driveThruPlaces.get(0).setText("1.Auto(W) ");
+                Main.updateScreen();
                 transferOrder(order);
             }
         });
@@ -69,22 +104,34 @@ public class Waiter extends Staff implements Observer<String> {
                 kitchen.acceptOrder(order);
             }
             if (!order.drinks.isEmpty()) {
-                move(diner.getHall().getBar());
-                Logger.debug("Order has been transferred to Bar " + order);
-                diner.getHall().getBar().acceptOrder(order);
+                Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(s -> {
+                    move(diner.getHall().getBar());
+                    Logger.debug("Order has been transferred to Bar " + order);
+                    diner.getHall().getBar().acceptOrder(order);
+                });
             }
             isFree = true;
         });
     }
 
     private void carryOrder(Order order) {
-        Logger.debug("Waiter took the ready Order");
-        Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
+        int k = 1;
+        if (currentRoom != kitchen) {
+            k = 1000;
+            move(kitchen);
+        }
+        else {
+        Logger.debug("Waiter " + number + " took the ready Order");
+        }
+        Observable.timer(1 * Diner.slowdown + k, TimeUnit.MILLISECONDS).subscribe(v -> {
             if (order.orderPlace == Room.OrderPlace.DRIVETHRU) {
                 move(driveThru);
                 driveThru.getCar().setOrder(order);
+                Main.driveThruPlaces.get(0).setText("1.Auto    ");
+                Main.updateScreen();
                 Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(s -> {
-                    changeMoney(driveThru.carGone().pay());
+                    clientMoney = driveThru.getCar().pay();
+                    driveThru.carGone();
                 });
                 Observable.timer(2 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(s -> {
                     givePaymentToBookkeeper();
@@ -93,8 +140,14 @@ public class Waiter extends Staff implements Observer<String> {
                 move(diner.getHall().getTables());
                 Client client = diner.getHall().getTables().getClient(order.table);
                 client.setOrder(order);
+                if (order.table < 5 || order.table == 9) {
+                    Main.canteenPlaces.get(order.table).setText((order.table + 1) + ".Client   ");
+                } else {
+                    Main.canteenPlaces.get(order.table).setText(" " + (order.table + 1) + ".Client   ");
+                }
+                Main.updateScreen();
                 Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(s -> {
-                    changeMoney(client.pay());
+                    clientMoney = client.pay();
                     if ((client.getMoney() < diner.getMenu().food.values().stream().min(Double::compare).get()
                             && client.getMoney() < diner.getMenu().drinks.values().stream().min(Double::compare).get())
                             || new Random().nextInt(10) > 3) {
@@ -126,20 +179,56 @@ public class Waiter extends Staff implements Observer<String> {
     private void givePaymentToBookkeeper() {
         Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
             move(diner.getBookkeeping());
-            diner.getBookkeeper().giveClientPayment(getMoney());
-            money = "$0";
+            diner.getBookkeeper().giveClientPayment(clientMoney);
+            clientMoney = 0;
         });
+    }
+
+    public int getActionSize() {
+        return action.size();
+    }
+
+    @Override
+    public void move(Room room) {
+        if (currentRoom == kitchen) {
+            Main.kitchenPlaces.get(number).setText("       ");
+            Main.updateScreen();
+        }
+        currentRoom = room;
+        if (currentRoom == kitchen) {
+            Main.kitchenPlaces.get(number).setText("Waiter ");
+            Main.updateScreen();
+        }
+        currentRoom.getDirty();
     }
 
     @Override
     public void useToilet() {
-        if (new Random().nextInt(10) < 2) {
-            Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
-                Logger.info(this.getClass().getSimpleName() + " used Toilet");
-                diner.getHall().getToilet().getDirty();
-                isFree = true;
+        if (new Random().nextInt(10) < 10) {
+            ArrayDeque<Human> queue = diner.getHall().getToilet().queue;
+            final boolean[] waiting = {true};
+            Observable.interval(1 * Diner.slowdown, TimeUnit.MILLISECONDS).takeWhile(l1 -> waiting[0]).subscribe(l2 -> {
+                if ((queue.size() - 1) / 4 == 0) {
+                    queue.addLast(this);
+                    int place = queue.size() - 1;
+                    waiting[0] = false;
+                    move(diner.getHall().getToilet());
+                    Main.restRoomPlaces.get(place).setText((place + 1) + ".Waiter  ");
+                    Main.updateScreen();
+                    Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
+                        Main.addToCmd("INFO: Waiter used Restroom");
+                        Logger.info(this.getClass().getSimpleName() + " used Toilet");
+                        queue.remove(this);
+                        Main.restRoomPlaces.get(place).setText((place + 1) + ".        ");
+                        move(kitchen);
+                        Main.updateScreen();
+                        diner.getHall().getToilet().getDirty();
+                        isFree = true;
+                    });
+                }
             });
         } else {
+            move(kitchen);
             isFree = true;
         }
     }
@@ -164,6 +253,7 @@ public class Waiter extends Staff implements Observer<String> {
                 } else if (s.equals(Kitchen.class.getSimpleName())) {
                     order = kitchen.getReadyOrder();
                     if (order.isready() && !order.placed) {
+                        order.placed = true;
                         carryOrder(order);
                     } else {
                         isFree = true;
@@ -173,6 +263,7 @@ public class Waiter extends Staff implements Observer<String> {
                     if (order.orderPlace == Room.OrderPlace.BAR) {
                         transferOrderFromBar(order);
                     } else if (order.isready() && !order.placed) {
+                        order.placed = true;
                         carryOrder(order);
                     } else {
                         isFree = true;

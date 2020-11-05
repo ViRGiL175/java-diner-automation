@@ -7,6 +7,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import org.tinylog.Logger;
 import ru.commandos.Diner;
 import ru.commandos.Humans.Client;
+import ru.commandos.Main;
 
 import java.util.Random;
 
@@ -38,10 +39,11 @@ public class Hall implements Observer<String> {
 
     @Override
     public void onSubscribe(@NonNull Disposable d) {
+        Main.addToCmd("INFO: Hall is open");
         Logger.info("Hall is open");
         bar.subscribe(diner.getBarmen());
-        bar.subscribe(diner.getWaiter());
-        tables.subscribe(diner.getWaiter());
+        bar.subscribe(diner.getWaiterController());
+        tables.subscribe(diner.getWaiterController());
     }
 
     @Override
@@ -56,7 +58,9 @@ public class Hall implements Observer<String> {
                 bar.setClient(client);
             }
         } else {
-            Logger.info(client + " did't enter, because he haven't money");
+            Main.addToCmd("INFO: " + client + " did't enter, he haven't money");
+            Main.updateScreen();
+            Logger.info(client + " did't enter, he haven't money");
         }
     }
 

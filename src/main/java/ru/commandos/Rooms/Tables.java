@@ -6,6 +6,8 @@ import org.tinylog.Logger;
 import ru.commandos.Diner;
 import ru.commandos.Humans.Client;
 import ru.commandos.Humans.Waiter;
+import ru.commandos.Humans.WaiterController;
+import ru.commandos.Main;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -31,9 +33,10 @@ public class Tables extends Room {
         this.diner = diner;
     }
 
-    public void subscribe(Waiter waiter) {
-        waiterCaller.subscribe(waiter);
-        Logger.info("Waiter is ready to work");
+    public void subscribe(WaiterController waiterController) {
+        waiterCaller.subscribe(waiterController);
+        Main.addToCmd("INFO: Waiters is ready to work");
+        Logger.info("Waiters is ready to work");
     }
 
     public Client getClient(Integer tableNumber) {
@@ -50,16 +53,22 @@ public class Tables extends Room {
             tables.set(table, client);
             freePlace.remove(table);
             Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
+                Main.addToCmd("INFO: " + client + " ready to do order!");
+                Main.updateScreen();
                 Logger.info(client + " ready to do order!");
                 waiterCaller.onNext(Tables.class.getSimpleName() + table);
             });
         } else {
+            Main.addToCmd("No place in Canteen!");
+            Main.updateScreen();
             Logger.warn("No place!");
         }
     }
 
     public void reOrder(Integer table) {
         Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
+            Main.addToCmd("INFO: " + getClient(table) + " ready to do order again!");
+            Main.updateScreen();
             Logger.info(getClient(table) + " ready to do order again!");
             waiterCaller.onNext(Tables.class.getSimpleName() + table);
         });
@@ -69,12 +78,44 @@ public class Tables extends Room {
         Client client = getClient(table);
         diner.feedback(client);
         tables.set(table, null);
+        if (table < 5 || table == 9) {
+            Main.canteenPlaces.get(table).setText((table + 1) + ".         ");
+        }
+        else {
+            Main.canteenPlaces.get(table).setText(" " + (table + 1) + ".         ");
+        }
+        Main.updateScreen();
         freePlace.add(table);
-        Logger.info("Client is gone (feedback: " + client.feedback + "), chair #" + table + " is free");
+        Main.addToCmd("INFO: Client is gone (feedback: " + client.feedback + "), table #" + table + " is free");
+        Main.updateScreen();
+        Logger.info("Client is gone (feedback: " + client.feedback + "), table #" + table + " is free");
     }
 
     public Toilet getToilet() {
         return diner.getHall().getToilet();
+    }
+
+    public int getFreePlace() {
+        int random = new Random().nextInt(freePlace.size());
+        int table = new ArrayList<>(freePlace).get(random);
+        freePlace.remove(table);
+        return table;
+    }
+
+    public void cleanerGone(int table) {
+        if (table < 5 || table == 9) {
+            Main.canteenPlaces.get(table).setText((table + 1) + ".         ");
+        }
+        else {
+            Main.canteenPlaces.get(table).setText(" " + (table + 1) + ".         ");
+        }
+        Main.updateScreen();
+        freePlace.add(table);
+    }
+
+    @Override
+    public boolean hasFreePlace() {
+        return !freePlace.isEmpty();
     }
 
     @Override

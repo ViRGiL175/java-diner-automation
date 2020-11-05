@@ -7,8 +7,10 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import org.tinylog.Logger;
 import ru.commandos.Diner;
 import ru.commandos.Food.Dish.Dish;
+import ru.commandos.Main;
 import ru.commandos.Order;
 import ru.commandos.Rooms.Kitchen;
+import ru.commandos.Rooms.Room;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -23,9 +25,12 @@ public class Cook extends Staff implements Observer<Order> {
     private long actionCount;
     private final Deque<Long> action = new ArrayDeque<>();
 
-    public Cook(Diner diner, Kitchen kitchen) {
+    private final int number;
+
+    public Cook(Diner diner, Kitchen kitchen, int number) {
         super(diner);
         this.kitchen = kitchen;
+        this.number = number;
         currentRoom = kitchen;
     }
 
@@ -38,20 +43,47 @@ public class Cook extends Staff implements Observer<Order> {
         }
         currentRoom.getDirty();
 
+        Main.addToCmd("DEBUG: Cook cooked dishes: Order{",
+                "dishes=" + order.dishes.toString(),
+                "drinks=" + order.drinks.toString(),
+                "table=" + ((order.orderPlace == Room.OrderPlace.DRIVETHRU) ? "D-Thru" : order.table.toString()), "cost=" + String.valueOf(order.cost) + "}");
         Logger.info("List of remaining ingredients in the Kitchen: " + kitchen.checkIngredients());
-        Logger.debug("Cook cooked dishes " + order);
+        Logger.debug("Cook " + number + " cooked dishes" + order);
+        Main.cookPlaces.get(number).setText("Cook   ");
+        Main.updateScreen();
         kitchen.transferDish(order);
 
         useToilet();
     }
 
+    public int getActionSize() {
+        return action.size();
+    }
+
     @Override
     public void useToilet() {
         if (new Random().nextInt(10) < 2) {
-            Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
-                Logger.info(this.getClass().getSimpleName() + " used Toilet");
-                diner.getHall().getToilet().getDirty();
-                isFree = true;
+            ArrayDeque<Human> queue = diner.getHall().getToilet().queue;
+            final boolean[] waiting = {true};
+            Observable.interval(1 * Diner.slowdown, TimeUnit.MILLISECONDS).takeWhile(l1 -> waiting[0]).subscribe(l2 -> {
+                if ((queue.size() - 1) / 4 == 0) {
+                    queue.addLast(this);
+                    int place = queue.size() - 1;
+                    waiting[0] = false;
+                    Main.cookPlaces.get(number).setText("       ");
+                    Main.restRoomPlaces.get(place).setText((place + 1) + ".Cook    ");
+                    Main.updateScreen();
+                    Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
+                        Main.addToCmd("INFO: Cook used Restroom");
+                        Logger.info(this.getClass().getSimpleName() + " used Toilet");
+                        queue.remove(this);
+                        Main.restRoomPlaces.get(place).setText((place + 1) + ".        ");
+                        Main.cookPlaces.get(number).setText("Cook   ");
+                        Main.updateScreen();
+                        diner.getHall().getToilet().getDirty();
+                        isFree = true;
+                    });
+                }
             });
         }
         else {
@@ -61,7 +93,6 @@ public class Cook extends Staff implements Observer<Order> {
 
     @Override
     public void onSubscribe(@NonNull Disposable d) {
-        Logger.info("Cook is ready to work");
     }
 
     @Override
@@ -75,7 +106,13 @@ public class Cook extends Staff implements Observer<Order> {
             if (isFree && action.peekFirst() == actionNumber) {
                 action.pollFirst();
                 isFree = false;
-                Logger.debug("Cook is cooking " + order);
+                Main.addToCmd("DEBUG: Cook is cooking: Order{",
+                        "dishes=" + order.dishes.toString(),
+                        "drinks=" + order.drinks.toString(),
+                        "table=" + ((order.orderPlace == Room.OrderPlace.DRIVETHRU) ? "D-Thru" : order.table.toString()), "cost=" + String.valueOf(order.cost) + "}");
+                Logger.debug("Cook " + number + " is cooking " + order);
+                Main.cookPlaces.get(number).setText("Cook(C)");
+                Main.updateScreen();
                 Observable.timer(5 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> cook(order));
             }
         });

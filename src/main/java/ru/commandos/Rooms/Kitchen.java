@@ -1,9 +1,13 @@
 package ru.commandos.Rooms;
 
 import io.reactivex.rxjava3.subjects.PublishSubject;
+import org.tinylog.Logger;
 import ru.commandos.Diner;
 import ru.commandos.Humans.Cook;
+import ru.commandos.Humans.CookController;
 import ru.commandos.Humans.Waiter;
+import ru.commandos.Humans.WaiterController;
+import ru.commandos.Main;
 import ru.commandos.Order;
 
 import java.util.ArrayDeque;
@@ -34,12 +38,14 @@ public class Kitchen extends Room {
         this.diner = diner;
     }
 
-    public void subscribe(Cook cook) {
-        dashboard.subscribe(cook);
+    public void subscribe(CookController cookController) {
+        dashboard.subscribe(cookController);
+        Main.addToCmd("INFO: Cooks is ready to work");
+        Logger.info("Cooks is ready to work");
     }
 
-    public void subscribe(Waiter waiter) {
-        bell.subscribe(waiter);
+    public void subscribe(WaiterController waiterController) {
+        bell.subscribe(waiterController);
     }
 
     public void acceptOrder(Order order) {
@@ -69,6 +75,11 @@ public class Kitchen extends Room {
 
     public HashMap<String, Integer> checkIngredients() {
         return ingredients;
+    }
+
+    @Override
+    public boolean hasFreePlace() {
+        return true;
     }
 
     @Override

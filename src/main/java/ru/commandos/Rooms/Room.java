@@ -6,5 +6,7 @@ public abstract class Room {
         TABLES, BAR, DRIVETHRU
     }
 
+    public abstract boolean hasFreePlace();
+
     public abstract void getDirty();
 }

@@ -34,11 +34,7 @@ public class Order {
         return "Order{" +
                 "food=" + dishes +
                 ", drinks=" + drinks +
-                ", doneFood=" + doneDishes +
-                ", doneDrinks=" + doneDrinks +
-                ((orderPlace == Room.OrderPlace.DRIVETHRU)
-                        ? (", orderPlace=" + orderPlace.name())
-                        : (", orderPlace=" + orderPlace.name() + ", table=" + table)) +
+                ", table=" + table +
                 ", cost=" + String.format("$%.2f", cost) +
                 '}';
     }
@@ -46,6 +42,7 @@ public class Order {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
+        if (o == null) return false;
         if (!(o instanceof Order)) return false;
         Order order = (Order) o;
         return dishes.equals(order.dishes) &&

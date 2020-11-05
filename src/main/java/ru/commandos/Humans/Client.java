@@ -5,12 +5,14 @@ import org.tinylog.Logger;
 import ru.commandos.Diner;
 import ru.commandos.Food.Dish.Dish;
 import ru.commandos.Food.Drink.Drink;
+import ru.commandos.Main;
 import ru.commandos.Menu;
 import ru.commandos.Order;
 import ru.commandos.Rooms.Bar;
 import ru.commandos.Rooms.Room;
 import ru.commandos.Rooms.Tables;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
@@ -37,15 +39,24 @@ public class Client extends Human {
     public void setTable(Integer table) {
         this.table = table;
         if (orderPlace == Room.OrderPlace.TABLES) {
+            if (table < 5 || table == 9) {
+                Main.canteenPlaces.get(table).setText((table + 1) + ".Client   ");
+            } else {
+                Main.canteenPlaces.get(table).setText(" " + (table + 1) + ".Client   ");
+            }
+            Main.addToCmd("INFO: " + this + " sat at the table #" + table);
             Logger.info(this + " sat at the table #" + table);
-        }
-        else {
+        } else {
+            Main.counterPlaces.get(table).setText((table + 1) + ".Client   ");
+            Main.addToCmd("INFO: " + this + " sat at the chair #" + table);
             Logger.info(this + " sat at the chair #" + table);
         }
+        Main.updateScreen();
     }
 
     public void setMenu(Menu menu) {
         this.menu = menu;
+        Main.addToCmd("INFO: " + this + " got a menu");
         Logger.info(this + " got a menu");
     }
 
@@ -91,8 +102,8 @@ public class Client extends Human {
         if (!this.order.equals(order)) {
             Logger.warn("Waiter made a mistake with the order :(");
         } else {
+            Main.addToCmd("INFO: " + this + " got order");
             Logger.info("Client got order");
-            order.placed = true;
         }
         currentRoom.getDirty();
 
@@ -102,19 +113,58 @@ public class Client extends Human {
 
     public Double pay() {
         changeMoney(-order.cost);
+        Main.addToCmd("INFO: " + this + " paid for order");
         Logger.info("Client paid for order");
         return order.cost;
     }
 
     @Override
     public void useToilet() {
-        if (new Random().nextInt(10) < 2) {
-            Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
-                Logger.info(this.getClass().getSimpleName() + " used Toilet");
-                if (currentRoom instanceof Tables) {
-                    ((Tables) currentRoom).getToilet().getDirty();
-                } else if (currentRoom instanceof Bar) {
-                    ((Bar) currentRoom).getToilet().getDirty();
+        if (orderPlace != Room.OrderPlace.DRIVETHRU && new Random().nextInt(10) < 2) {
+            ArrayDeque<Human> queue;
+            if (currentRoom instanceof Tables) {
+                queue = ((Tables) currentRoom).getToilet().queue;
+            } else {
+                queue = ((Bar) currentRoom).getToilet().queue;
+            }
+            final boolean[] waiting = {true};
+            Observable.interval(1 * Diner.slowdown, TimeUnit.MILLISECONDS).takeWhile(l1 -> waiting[0]).subscribe(l2 -> {
+                if ((queue.size() - 1) / 4 == 0) {
+                    queue.addLast(this);
+                    int place = queue.size() - 1;
+                    waiting[0] = false;
+                    if (orderPlace == Room.OrderPlace.TABLES) {
+                        if (table < 5 || table == 9) {
+                            Main.canteenPlaces.get(table).setText((table + 1) + ".         ");
+                        } else {
+                            Main.canteenPlaces.get(table).setText(" " + (table + 1) + ".         ");
+                        }
+                    } else {
+                        Main.counterPlaces.get(table).setText((table + 1) + ".        ");
+                    }
+                    Main.restRoomPlaces.get(place).setText((place + 1) + ".Client   ");
+                    Main.updateScreen();
+                    Observable.timer(1 * Diner.slowdown, TimeUnit.MILLISECONDS).subscribe(v -> {
+                        Main.addToCmd(this + " used Restroom");
+                        Logger.info(this.getClass().getSimpleName() + " used Toilet");
+                        queue.remove(this);
+                        Main.restRoomPlaces.get(place).setText((place + 1) + ".        ");
+                        if (orderPlace == Room.OrderPlace.TABLES) {
+                            if (table < 5 || table == 9) {
+                                Main.canteenPlaces.get(table).setText((table + 1) + ".Client   ");
+                            } else {
+                                Main.canteenPlaces.get(table).setText(" " + (table + 1) + ".Client   ");
+                            }
+                        } else {
+                            Main.counterPlaces.get(table).setText((table + 1) + ".Client   ");
+                        }
+                        if (currentRoom instanceof Tables) {
+                            ((Tables) currentRoom).getToilet().getDirty();
+                        } else if (currentRoom instanceof Bar) {
+                            ((Bar) currentRoom).getToilet().getDirty();
+                        }
+                        Main.updateScreen();
+                    });
                 }
             });
         }
@@ -123,11 +173,7 @@ public class Client extends Human {
     @Override
     public String toString() {
         return "Client{" +
-                "table=" + table +
-                ", menu=" + menu +
-                ", uuid='" + uuid + '\'' +
-                ", order=" + order +
-                ", money='" + money + '\'' +
+                "uuid='" + new StringBuilder(uuid).delete(18, 36) +
                 '}';
     }
 }
